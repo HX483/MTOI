@@ -36,9 +36,15 @@ export default {
         return
       }
       let real_src = this.src.split(",")[0]
+      // 处理外部链接
       if (isExternal(real_src)) {
         return real_src
       }
+      // 特殊处理以img/开头的路径，这类路径直接指向public目录下的图片
+      if (real_src.startsWith('img/')) {
+        return '/' + real_src
+      }
+      // 其他相对路径添加API前缀
       return process.env.VUE_APP_BASE_API + real_src
     },
     realSrcList() {
@@ -48,9 +54,15 @@ export default {
       let real_src_list = this.src.split(",")
       let srcList = []
       real_src_list.forEach(item => {
+        // 处理外部链接
         if (isExternal(item)) {
           return srcList.push(item)
         }
+        // 特殊处理以img/开头的路径，这类路径直接指向public目录下的图片
+        if (item.startsWith('img/')) {
+          return srcList.push('/' + item)
+        }
+        // 其他相对路径添加API前缀
         return srcList.push(process.env.VUE_APP_BASE_API + item)
       })
       return srcList

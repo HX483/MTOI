@@ -61,6 +61,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!--     product -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-product</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
