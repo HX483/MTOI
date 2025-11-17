@@ -1,4 +1,4 @@
-package com.ruoyi.product.domain;
+package com.ruoyi.material.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -6,12 +6,12 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.TreeEntity;
 
 /**
- * 产品分类对象 product_category
+ * 原料分类对象 material_category
  * 
  * @author xihao
- * @date 2025-11-11
+ * @date 2025-11-14
  */
-public class ProductCategory extends TreeEntity
+public class MaterialCategory extends TreeEntity
 {
     private static final long serialVersionUID = 1L;
 

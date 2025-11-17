@@ -218,13 +218,19 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+
             <!-- product     -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-product</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
-
+            <!-- material     -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-material</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -237,6 +243,7 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-product</module>
+        <module>ruoyi-material</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -66,6 +66,11 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-product</artifactId>
         </dependency>
+        <!--     material -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-material</artifactId>
+        </dependency>
 
     </dependencies>
 
