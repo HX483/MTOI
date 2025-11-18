@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+    <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">{{title}}</h3>
       <el-form-item prop="username">
         <el-input
@@ -9,7 +9,9 @@
           auto-complete="off"
           placeholder="账号"
         >
-          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="user" class="el-input__icon input-icon" />
+          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
@@ -18,9 +20,11 @@
           type="password"
           auto-complete="off"
           placeholder="密码"
-          @keyup.enter.native="handleLogin"
+          @keyup.enter="handleLogin"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="password" class="el-input__icon input-icon" />
+          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="code" v-if="captchaEnabled">
@@ -29,9 +33,11 @@
           auto-complete="off"
           placeholder="验证码"
           style="width: 63%"
-          @keyup.enter.native="handleLogin"
+          @keyup.enter="handleLogin"
         >
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="validCode" class="el-input__icon input-icon" />
+          </template>
         </el-input>
         <div class="login-code">
           <img :src="codeUrl" @click="getCode" class="login-code-img"/>
@@ -44,7 +50,7 @@
           size="medium"
           type="primary"
           style="width:100%;"
-          @click.native.prevent="handleLogin"
+          @click.prevent="handleLogin"
         >
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
@@ -61,99 +67,106 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { useRoute, useRouter } from 'vue-router'
 import { getCodeImg } from "@/api/login"
 import Cookies from "js-cookie"
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
-export default {
-  name: "Login",
-  data() {
-    return {
-      title: process.env.VUE_APP_TITLE,
-      codeUrl: "",
-      loginForm: {
-        username: "admin",
-        password: "admin123",
-        rememberMe: false,
-        code: "",
-        uuid: ""
-      },
-      loginRules: {
-        username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" }
-        ],
-        password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" }
-        ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
-      },
-      loading: false,
-      // 验证码开关
-      captchaEnabled: true,
-      // 注册开关
-      register: false,
-      redirect: undefined
-    }
-  },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
-      },
-      immediate: true
-    }
-  },
-  created() {
-    this.getCode()
-    this.getCookie()
-  },
-  methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled
-        if (this.captchaEnabled) {
-          this.codeUrl = "data:image/gif;base64," + res.img
-          this.loginForm.uuid = res.uuid
-        }
-      })
-    },
-    getCookie() {
-      const username = Cookies.get("username")
-      const password = Cookies.get("password")
-      const rememberMe = Cookies.get('rememberMe')
-      this.loginForm = {
-        username: username === undefined ? this.loginForm.username : username,
-        password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
-      }
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 })
-            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 })
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 })
-          } else {
-            Cookies.remove("username")
-            Cookies.remove("password")
-            Cookies.remove('rememberMe')
-          }
-          this.$store.dispatch("Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{})
-          }).catch(() => {
-            this.loading = false
-            if (this.captchaEnabled) {
-              this.getCode()
-            }
-          })
-        }
-      })
-    }
-  }
+// 获取store和路由
+const userStore = useUserStore()
+const route = useRoute()
+const router = useRouter()
+
+// 响应式数据
+const title = ref(import.meta.env.VITE_APP_TITLE)
+const codeUrl = ref("")
+const loading = ref(false)
+const captchaEnabled = ref(true)
+const register = ref(false)
+const redirect = ref(undefined)
+const loginForm = reactive({
+  username: "admin",
+  password: "admin123",
+  rememberMe: false,
+  code: "",
+  uuid: ""
+})
+
+// 表单规则
+const loginRules = {
+  username: [
+    { required: true, trigger: "blur", message: "请输入您的账号" }
+  ],
+  password: [
+    { required: true, trigger: "blur", message: "请输入您的密码" }
+  ],
+  code: [{ required: true, trigger: "change", message: "请输入验证码" }]
 }
+
+// 表单引用
+const loginFormRef = ref()
+
+// 获取验证码
+const getCode = () => {
+  getCodeImg().then(res => {
+    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
+    if (captchaEnabled.value) {
+      codeUrl.value = "data:image/gif;base64," + res.img
+      loginForm.uuid = res.uuid
+    }
+  })
+}
+
+// 获取Cookie
+const getCookie = () => {
+  const username = Cookies.get("username")
+  const password = Cookies.get("password")
+  const rememberMe = Cookies.get('rememberMe')
+  loginForm.username = username === undefined ? loginForm.username : username
+  loginForm.password = password === undefined ? loginForm.password : decrypt(password)
+  loginForm.rememberMe = rememberMe === undefined ? false : Boolean(rememberMe)
+}
+
+// 登录处理
+const handleLogin = () => {
+  loginFormRef.value.validate(valid => {
+    if (valid) {
+      loading.value = true
+      if (loginForm.rememberMe) {
+        Cookies.set("username", loginForm.username, { expires: 30 })
+        Cookies.set("password", encrypt(loginForm.password), { expires: 30 })
+        Cookies.set('rememberMe', loginForm.rememberMe, { expires: 30 })
+      } else {
+        Cookies.remove("username")
+        Cookies.remove("password")
+        Cookies.remove('rememberMe')
+      }
+      // 使用Pinia的userStore替代Vuex的store
+      userStore.login(loginForm).then(() => {
+        router.push({ path: redirect.value || "/" }).catch(()=>{})
+      }).catch(() => {
+        loading.value = false
+        if (captchaEnabled.value) {
+          getCode()
+        }
+      })
+    }
+  })
+}
+
+// 监听路由变化
+watch(() => route, (newRoute) => {
+  redirect.value = newRoute.query && newRoute.query.redirect
+}, { immediate: true })
+
+// 组件挂载时执行
+onMounted(() => {
+  getCode()
+  getCookie()
+})
 </script>
 
 <style rel="stylesheet/scss" lang="scss">

@@ -61,7 +61,7 @@ export default {
   },
   data() {
     return {
-      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      uploadUrl: import.meta.env.VITE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken()
       },
@@ -184,7 +184,7 @@ export default {
         // 获取光标所在位置
         let length = quill.getSelection().index
         // 插入图片  res.url为服务器返回的图片地址
-        quill.insertEmbed(length, "image", process.env.VUE_APP_BASE_API + res.fileName)
+        quill.insertEmbed(length, "image", import.meta.env.VITE_APP_BASE_API + res.fileName)
         // 调整光标到最后
         quill.setSelection(length + 1)
       } else {

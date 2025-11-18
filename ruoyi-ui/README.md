@@ -1,3 +1,11 @@
+## 技术栈变更说明
+
+本项目已完成以下技术栈升级：
+
+1. **UI框架**：从 Element UI 2.x 升级到 Element Plus
+2. **构建工具**：从 Vue CLI 迁移到 Vite
+3. **Vue API**：组件已从 Options API 迁移到 Composition API
+
 ## 开发
 
 ```bash

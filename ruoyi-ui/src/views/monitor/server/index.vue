@@ -175,33 +175,33 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue"
 import { getServer } from "@/api/monitor/server"
+import { useModal } from "@/utils/ruoyi"
 
-export default {
-  name: "Server",
-  data() {
-    return {
-      // 服务器信息
-      server: []
-    }
-  },
-  created() {
-    this.getList()
-    this.openLoading()
-  },
-  methods: {
-    /** 查询服务器信息 */
-    getList() {
-      getServer().then(response => {
-        this.server = response.data
-        this.$modal.closeLoading()
-      })
-    },
-    // 打开加载层
-    openLoading() {
-      this.$modal.loading("正在加载服务监控数据，请稍候！")
-    }
-  }
+// 获取modal实例
+const $modal = useModal()
+
+// 服务器信息
+const server = ref([])
+
+/** 查询服务器信息 */
+const getList = () => {
+  getServer().then(response => {
+    server.value = response.data
+    $modal.closeLoading()
+  })
 }
+
+// 打开加载层
+const openLoading = () => {
+  $modal.loading("正在加载服务监控数据，请稍候！")
+}
+
+// 组件挂载时执行
+onMounted(() => {
+  getList()
+  openLoading()
+})
 </script>

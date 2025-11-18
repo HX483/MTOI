@@ -1,10 +1,12 @@
 <template>
   <div class="register">
-    <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
+    <el-form ref="registerFormRef" :model="registerForm" :rules="registerRules" class="register-form">
       <h3 class="title">{{title}}</h3>
       <el-form-item prop="username">
         <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
-          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="user" class="el-input__icon input-icon" />
+          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
@@ -13,9 +15,11 @@
           type="password"
           auto-complete="off"
           placeholder="密码"
-          @keyup.enter.native="handleRegister"
+          @keyup.enter="handleRegister"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="password" class="el-input__icon input-icon" />
+          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="confirmPassword">
@@ -24,9 +28,11 @@
           type="password"
           auto-complete="off"
           placeholder="确认密码"
-          @keyup.enter.native="handleRegister"
+          @keyup.enter="handleRegister"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="password" class="el-input__icon input-icon" />
+          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="code" v-if="captchaEnabled">
@@ -35,9 +41,11 @@
           auto-complete="off"
           placeholder="验证码"
           style="width: 63%"
-          @keyup.enter.native="handleRegister"
+          @keyup.enter="handleRegister"
         >
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+          <template #prefix>
+            <svg-icon icon-class="validCode" class="el-input__icon input-icon" />
+          </template>
         </el-input>
         <div class="register-code">
           <img :src="codeUrl" @click="getCode" class="register-code-img"/>
@@ -49,7 +57,7 @@
           size="medium"
           type="primary"
           style="width:100%;"
-          @click.native.prevent="handleRegister"
+          @click.prevent="handleRegister"
         >
           <span v-if="!loading">注 册</span>
           <span v-else>注 册 中...</span>
@@ -66,85 +74,97 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getCodeImg, register } from "@/api/login"
+import { ElMessageBox } from 'element-plus'
 
-export default {
-  name: "Register",
-  data() {
-    const equalToPassword = (rule, value, callback) => {
-      if (this.registerForm.password !== value) {
-        callback(new Error("两次输入的密码不一致"))
-      } else {
-        callback()
-      }
-    }
-    return {
-      title: process.env.VUE_APP_TITLE,
-      codeUrl: "",
-      registerForm: {
-        username: "",
-        password: "",
-        confirmPassword: "",
-        code: "",
-        uuid: ""
-      },
-      registerRules: {
-        username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" },
-          { min: 2, max: 20, message: '用户账号长度必须介于 2 和 20 之间', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" },
-          { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
-          { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
-        ],
-        confirmPassword: [
-          { required: true, trigger: "blur", message: "请再次输入您的密码" },
-          { required: true, validator: equalToPassword, trigger: "blur" }
-        ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
-      },
-      loading: false,
-      captchaEnabled: true
-    }
-  },
-  created() {
-    this.getCode()
-  },
-  methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled
-        if (this.captchaEnabled) {
-          this.codeUrl = "data:image/gif;base64," + res.img
-          this.registerForm.uuid = res.uuid
-        }
-      })
-    },
-    handleRegister() {
-      this.$refs.registerForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          register(this.registerForm).then(res => {
-            const username = this.registerForm.username
-            this.$alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", '系统提示', {
-              dangerouslyUseHTMLString: true,
-              type: 'success'
-            }).then(() => {
-              this.$router.push("/login")
-            }).catch(() => {})
-          }).catch(() => {
-            this.loading = false
-            if (this.captchaEnabled) {
-              this.getCode()
-            }
-          })
-        }
-      })
-    }
+// 获取路由实例
+const router = useRouter()
+
+// 响应式数据
+const title = ref(import.meta.env.VITE_APP_TITLE)
+const codeUrl = ref("")
+const loading = ref(false)
+const captchaEnabled = ref(true)
+const registerFormRef = ref()
+const registerForm = reactive({
+  username: "",
+  password: "",
+  confirmPassword: "",
+  code: "",
+  uuid: ""
+})
+
+// 表单验证规则
+const equalToPassword = (rule, value, callback) => {
+  if (registerForm.password !== value) {
+    callback(new Error("两次输入的密码不一致"))
+  } else {
+    callback()
   }
 }
+
+const registerRules = {
+  username: [
+    { required: true, trigger: "blur", message: "请输入您的账号" },
+    { min: 2, max: 20, message: '用户账号长度必须介于 2 和 20 之间', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, trigger: "blur", message: "请输入您的密码" },
+    { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
+    { pattern: /^[^"]'|\\]+$/, message: "不能包含非法字符：< > \" ' \\ |", trigger: "blur" }
+  ],
+  confirmPassword: [
+    { required: true, trigger: "blur", message: "请再次输入您的密码" },
+    { required: true, validator: equalToPassword, trigger: "blur" }
+  ],
+  code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+}
+
+// 获取验证码
+const getCode = () => {
+  getCodeImg().then(res => {
+    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
+    if (captchaEnabled.value) {
+      codeUrl.value = "data:image/gif;base64," + res.img
+      registerForm.uuid = res.uuid
+    }
+  })
+}
+
+// 注册处理
+const handleRegister = () => {
+  registerFormRef.value.validate(valid => {
+    if (valid) {
+      loading.value = true
+      register(registerForm).then(res => {
+        const username = registerForm.username
+        ElMessageBox.alert(
+          `<font color='red'>恭喜你，您的账号 ${username} 注册成功！</font>`, 
+          '系统提示', 
+          {
+            dangerouslyUseHTMLString: true,
+            type: 'success'
+          }
+        ).then(() => {
+          router.push("/login")
+        }).catch(() => {})
+      }).catch(() => {
+        loading.value = false
+        if (captchaEnabled.value) {
+          getCode()
+        }
+      })
+    }
+  })
+}
+
+// 组件挂载时执行（替代created）
+onMounted(() => {
+  getCode()
+})
 </script>
 
 <style rel="stylesheet/scss" lang="scss">

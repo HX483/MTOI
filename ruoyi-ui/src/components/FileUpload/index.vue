@@ -94,8 +94,8 @@ export default {
     return {
       number: 0,
       uploadList: [],
-      baseUrl: process.env.VUE_APP_BASE_API,
-      uploadFileUrl: process.env.VUE_APP_BASE_API + this.action, // 上传文件服务器地址
+      baseUrl: import.meta.env.VITE_APP_BASE_API,
+      uploadFileUrl: import.meta.env.VITE_APP_BASE_API + this.action, // 上传文件服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },

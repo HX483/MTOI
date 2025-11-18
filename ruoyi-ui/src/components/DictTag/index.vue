@@ -22,7 +22,7 @@
       </template>
     </template>
     <template v-if="unmatch && showValue">
-      {{ unmatchArray | handleArray }}
+      {{ formattedUnmatchArray }}
     </template>
   </div>
 </template>
@@ -70,15 +70,13 @@ export default {
       })
       return unmatch // 返回标志的值
     },
-
-  },
-  filters: {
-    handleArray(array) {
-      if (array.length === 0) return ''
-      return array.reduce((pre, cur) => {
+    // 替代Vue2过滤器的计算属性
+    formattedUnmatchArray() {
+      if (this.unmatchArray.length === 0) return ''
+      return this.unmatchArray.reduce((pre, cur) => {
         return pre + ' ' + cur
       })
-    },
+    }
   }
 }
 </script>

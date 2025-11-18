@@ -35,8 +35,8 @@ export default {
   },
   data() {
     return {
-      title: process.env.VUE_APP_TITLE,
-      logo: logoImg
+      title: import.meta.env.VITE_APP_TITLE,
+      logo: require('@/assets/images/logo.png')
     }
   }
 }

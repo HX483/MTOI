@@ -9,84 +9,95 @@
   </el-breadcrumb>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      levelList: null
-    }
-  },
-  watch: {
-    $route(route) {
-      // if you go to the redirect page, do not update the breadcrumbs
-      if (route.path.startsWith('/redirect/')) {
-        return
-      }
-      this.getBreadcrumb()
-    }
-  },
-  created() {
-    this.getBreadcrumb()
-  },
-  methods: {
-    getBreadcrumb() {
-      // only show routes with meta.title
-      let matched = []
-      const router = this.$route
-      const pathNum = this.findPathNum(router.path)
-      // multi-level menu
-      if (pathNum > 2) {
-        const reg = /\/\w+/gi
-        const pathList = router.path.match(reg).map((item, index) => {
-          if (index !== 0) item = item.slice(1)
-          return item
-        })
-        this.getMatched(pathList, this.$store.getters.defaultRoutes, matched)
-      } else {
-        matched = router.matched.filter(item => item.meta && item.meta.title)
-      }
-      // 判断是否为首页
-      if (!this.isDashboard(matched[0])) {
-        matched = [{ path: "/index", meta: { title: "首页" } }].concat(matched)
-      }
-      this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
-    },
-    findPathNum(str, char = "/") {
-      let index = str.indexOf(char)
-      let num = 0
-      while (index !== -1) {
-        num++
-        index = str.indexOf(char, index + 1)
-      }
-      return num
-    },
-    getMatched(pathList, routeList, matched) {
-      let data = routeList.find(item => item.path == pathList[0] || (item.name += '').toLowerCase() == pathList[0])
-      if (data) {
-        matched.push(data)
-        if (data.children && pathList.length) {
-          pathList.shift()
-          this.getMatched(pathList, data.children, matched)
-        }
-      }
-    },
-    isDashboard(route) {
-      const name = route && route.name
-      if (!name) {
-        return false
-      }
-      return name.trim() === 'Index'
-    },
-    handleLink(item) {
-      const { redirect, path } = item
-      if (redirect) {
-        this.$router.push(redirect)
-        return
-      }
-      this.$router.push(path)
+<script setup>
+import { ref, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'pinia'
+
+// 响应式数据定义
+const levelList = ref(null)
+const route = useRoute()
+const router = useRouter()
+const store = useStore()
+
+// 获取面包屑数据
+const getBreadcrumb = () => {
+  // only show routes with meta.title
+  let matched = []
+  const pathNum = findPathNum(route.path)
+  // multi-level menu
+  if (pathNum > 2) {
+    const reg = /\/\w+/gi
+    const pathList = route.path.match(reg).map((item, index) => {
+      if (index !== 0) item = item.slice(1)
+      return item
+    })
+    getMatched(pathList, store.getters.defaultRoutes, matched)
+  } else {
+    matched = route.matched.filter(item => item.meta && item.meta.title)
+  }
+  // 判断是否为首页
+  if (!isDashboard(matched[0])) {
+    matched = [{ path: "/index", meta: { title: "首页" } }].concat(matched)
+  }
+  levelList.value = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
+}
+
+// 查找路径中的斜杠数量
+const findPathNum = (str, char = "/") => {
+  let index = str.indexOf(char)
+  let num = 0
+  while (index !== -1) {
+    num++
+    index = str.indexOf(char, index + 1)
+  }
+  return num
+}
+
+// 递归获取匹配的路由
+const getMatched = (pathList, routeList, matched) => {
+  let data = routeList.find(item => item.path == pathList[0] || (item.name += '').toLowerCase() == pathList[0])
+  if (data) {
+    matched.push(data)
+    if (data.children && pathList.length) {
+      pathList.shift()
+      getMatched(pathList, data.children, matched)
     }
   }
 }
+
+// 判断是否为首页
+const isDashboard = (route) => {
+  const name = route && route.name
+  if (!name) {
+    return false
+  }
+  return name.trim() === 'Index'
+}
+
+// 处理链接点击
+const handleLink = (item) => {
+  const { redirect, path } = item
+  if (redirect) {
+    router.push(redirect)
+    return
+  }
+  router.push(path)
+}
+
+// 监听路由变化
+watch(() => route.path, (newPath) => {
+  // if you go to the redirect page, do not update the breadcrumbs
+  if (newPath.startsWith('/redirect/')) {
+    return
+  }
+  getBreadcrumb()
+}, { immediate: true })
+
+// 组件挂载时获取面包屑数据
+onMounted(() => {
+  getBreadcrumb()
+})
 </script>
 
 <style lang="scss" scoped>

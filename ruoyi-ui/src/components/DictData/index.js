@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import store from '@/store'
 import DataDict from '@/utils/dict'
 import { getDicts as getDicts } from '@/api/system/dict/data'
@@ -18,32 +18,33 @@ function searchDictByKey(dict, key) {
   }
 }
 
-function install() {
-  Vue.use(DataDict, {
-    metas: {
-      '*': {
-        labelField: 'dictLabel',
-        valueField: 'dictValue',
-        request(dictMeta) {
-          const storeDict = searchDictByKey(store.getters.dict, dictMeta.type)
-          if (storeDict) {
-            return new Promise(resolve => { resolve(storeDict) })
-          } else {
-            return new Promise((resolve, reject) => {
-              getDicts(dictMeta.type).then(res => {
-                store.dispatch('dict/setDict', { key: dictMeta.type, value: res.data })
-                resolve(res.data)
-              }).catch(error => {
-                reject(error)
+export default {
+  install(app, options = {}) {
+    const defaultOptions = {
+      metas: {
+        '*': {
+          labelField: 'dictLabel',
+          valueField: 'dictValue',
+          request(dictMeta) {
+            const storeDict = searchDictByKey(store.getters.dict, dictMeta.type)
+            if (storeDict) {
+              return new Promise(resolve => { resolve(storeDict) })
+            } else {
+              return new Promise((resolve, reject) => {
+                getDicts(dictMeta.type).then(res => {
+                  store.dispatch('dict/setDict', { key: dictMeta.type, value: res.data })
+                  resolve(res.data)
+                }).catch(error => {
+                  reject(error)
+                })
               })
-            })
-          }
+            }
+          },
         },
       },
-    },
-  })
-}
-
-export default {
-  install,
+      ...options
+    }
+    
+    app.use(DataDict, defaultOptions)
+  }
 }

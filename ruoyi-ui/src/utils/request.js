@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Notification, MessageBox, Message, Loading } from 'element-ui'
+import { ElNotification, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
@@ -11,11 +11,20 @@ let downloadLoadingInstance
 // 是否显示重新登录
 export let isRelogin = { show: false }
 
+// 重命名为兼容原来的代码
+const Notification = ElNotification;
+const MessageBox = ElMessageBox;
+const Message = ElMessage;
+const Loading = ElLoading;
+
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
+// 获取环境变量
+const env = import.meta.env;
+
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL: process.env.VUE_APP_BASE_API,
+  baseURL: env.VITE_APP_BASE_API,
   // 超时
   timeout: 10000
 })

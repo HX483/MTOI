@@ -1,14 +1,16 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
 import Cookies from 'js-cookie'
 
-import Element from 'element-ui'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import './assets/styles/element-variables.scss'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 import '@/assets/styles/index.scss' // global css
 import '@/assets/styles/ruoyi.scss' // ruoyi css
-import App from './App'
-import store from './store'
+import App from './App.vue'
 import router from './router'
 import directive from './directive' // directive
 import plugins from './plugins' // plugins
@@ -36,29 +38,36 @@ import DictTag from '@/components/DictTag'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
+// 创建应用实例
+const app = createApp(App)
+const pinia = createPinia()
+
 // 全局方法挂载
-Vue.prototype.getDicts = getDicts
-Vue.prototype.getConfigKey = getConfigKey
-Vue.prototype.parseTime = parseTime
-Vue.prototype.resetForm = resetForm
-Vue.prototype.addDateRange = addDateRange
-Vue.prototype.selectDictLabel = selectDictLabel
-Vue.prototype.selectDictLabels = selectDictLabels
-Vue.prototype.download = download
-Vue.prototype.handleTree = handleTree
+app.config.globalProperties.getDicts = getDicts
+app.config.globalProperties.getConfigKey = getConfigKey
+app.config.globalProperties.parseTime = parseTime
+app.config.globalProperties.resetForm = resetForm
+app.config.globalProperties.addDateRange = addDateRange
+app.config.globalProperties.selectDictLabel = selectDictLabel
+app.config.globalProperties.selectDictLabels = selectDictLabels
+app.config.globalProperties.download = download
+app.config.globalProperties.handleTree = handleTree
 
 // 全局组件挂载
-Vue.component('DictTag', DictTag)
-Vue.component('Pagination', Pagination)
-Vue.component('RightToolbar', RightToolbar)
-Vue.component('Editor', Editor)
-Vue.component('FileUpload', FileUpload)
-Vue.component('ImageUpload', ImageUpload)
-Vue.component('ImagePreview', ImagePreview)
+app.component('DictTag', DictTag)
+app.component('Pagination', Pagination)
+app.component('RightToolbar', RightToolbar)
+app.component('Editor', Editor)
+app.component('FileUpload', FileUpload)
+app.component('ImageUpload', ImageUpload)
+app.component('ImagePreview', ImagePreview)
 
-Vue.use(directive)
-Vue.use(plugins)
-DictData.install()
+// 使用插件
+app.use(pinia)
+app.use(router)
+app.use(directive)
+app.use(plugins)
+app.use(DictData)
 
 /**
  * If you don't want to use mock-server
@@ -69,15 +78,10 @@ DictData.install()
  * please remove it before going online! ! !
  */
 
-Vue.use(Element, {
-  size: Cookies.get('size') || 'medium' // set element-ui default size
+app.use(ElementPlus, {
+  size: Cookies.get('size') || 'small', // set element-plus default size
+  locale: zhCn // 设置中文语言
 })
 
-Vue.config.productionTip = false
-
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-})
+// 挂载应用
+app.mount('#app')

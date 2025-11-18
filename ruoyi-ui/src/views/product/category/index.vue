@@ -131,8 +131,8 @@
 
 <script>
 import { listCategory, getCategory, delCategory, addCategory, updateCategory } from "@/api/product/category"
-import Treeselect from "@riophae/vue-treeselect"
-import "@riophae/vue-treeselect/dist/vue-treeselect.css"
+import Treeselect from "vue3-treeselect"
+import "vue3-treeselect/dist/vue3-treeselect.css"
 import { getDicts } from "@/api/system/dict/data"
 
 export default {

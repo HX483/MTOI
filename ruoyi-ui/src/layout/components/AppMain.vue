@@ -10,38 +10,37 @@
   </section>
 </template>
 
-<script>
+<script setup>
+import { computed, watch, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import copyright from "./Copyright/index"
 import iframeToggle from "./IframeToggle/index"
 
-export default {
-  name: 'AppMain',
-  components: { iframeToggle, copyright },
-  computed: {
-    cachedViews() {
-      return this.$store.state.tagsView.cachedViews
-    },
-    key() {
-      return this.$route.path
-    }
-  },
-  watch: {
-    $route() {
-      this.addIframe()
-    }
-  },
-  mounted() {
-    this.addIframe()
-  },
-  methods: {
-    addIframe() {
-      const { name } = this.$route
-      if (name && this.$route.meta.link) {
-        this.$store.dispatch('tagsView/addIframeView', this.$route)
-      }
-    }
+// 获取Vuex store
+const store = useStore()
+// 获取路由
+const route = useRoute()
+
+// 计算属性
+const cachedViews = computed(() => store.state.tagsView.cachedViews)
+const key = computed(() => route.path)
+
+// 方法
+const addIframe = () => {
+  const { name } = route
+  if (name && route.meta.link) {
+    store.dispatch('tagsView/addIframeView', route)
   }
 }
+
+// 监听路由变化
+watch(() => route, addIframe, { immediate: false })
+
+// 组件挂载时执行
+onMounted(() => {
+  addIframe()
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 import router from './router'
-import store from './store'
-import { Message } from 'element-ui'
+import { useUserStore, useSettingsStore, usePermissionStore } from '@/stores'
+import { ElMessage } from 'element-plus'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/auth'
@@ -17,8 +17,12 @@ const isWhiteList = (path) => {
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
+  const userStore = useUserStore()
+  const settingsStore = useSettingsStore()
+  const permissionStore = usePermissionStore()
+  
   if (getToken()) {
-    to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
+    to.meta.title && settingsStore.setTitle(to.meta.title)
     /* has token*/
     if (to.path === '/login') {
       next({ path: '/' })
@@ -26,22 +30,25 @@ router.beforeEach((to, from, next) => {
     } else if (isWhiteList(to.path)) {
       next()
     } else {
-      if (store.getters.roles.length === 0) {
+      if (userStore.roles.length === 0) {
         isRelogin.show = true
         // 判断当前用户是否已拉取完user_info信息
-        store.dispatch('GetInfo').then(() => {
+        userStore.getInfo().then(() => {
           isRelogin.show = false
-          store.dispatch('GenerateRoutes').then(accessRoutes => {
+          permissionStore.generateRoutes().then(accessRoutes => {
             // 根据roles权限生成可访问的路由表
-            router.addRoutes(accessRoutes) // 动态添加可访问路由表
-            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+            // Vue Router 4使用addRoute而不是addRoutes
+            accessRoutes.forEach(route => {
+              router.addRoute(route)
+            })
+            next({ ...to, replace: true }) // hack方法 确保路由已添加完成
           })
         }).catch(err => {
-            store.dispatch('LogOut').then(() => {
-              Message.error(err)
-              next({ path: '/' })
-            })
+          userStore.logout().then(() => {
+            ElMessage.error(err)
+            next({ path: '/' })
           })
+        })
       } else {
         next()
       }

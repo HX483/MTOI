@@ -1,7 +1,4 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-
-Vue.use(Router)
+import { createRouter, createWebHistory } from 'vue-router'
 
 /* Layout */
 import Layout from '@/layout'
@@ -164,20 +161,14 @@ export const dynamicRoutes = [
   }
 ]
 
-// 防止连续点击多次路由报错
-let routerPush = Router.prototype.push
-let routerReplace = Router.prototype.replace
-// push
-Router.prototype.push = function push(location) {
-  return routerPush.call(this, location).catch(err => err)
-}
-// replace
-Router.prototype.replace = function push(location) {
-  return routerReplace.call(this, location).catch(err => err)
-}
+// 动态路由，基于用户权限动态去加载
 
-export default new Router({
-  mode: 'history', // 去掉url中的#
+// 创建路由实例
+const router = createRouter({
+  history: createWebHistory(),
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
+
+// 导出默认路由
+export default router

@@ -5,7 +5,8 @@ import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import { blobValidate } from "@/utils/ruoyi"
 
-const baseURL = process.env.VUE_APP_BASE_API
+// 下载文件
+const baseURL = import.meta.env.VITE_APP_BASE_API
 let downloadLoadingInstance
 
 export default {

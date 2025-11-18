@@ -45,7 +45,7 @@ export default {
         return '/' + real_src
       }
       // 其他相对路径添加API前缀
-      return process.env.VUE_APP_BASE_API + real_src
+      return import.meta.env.VITE_APP_BASE_API + real_src
     },
     realSrcList() {
       if (!this.src) {
@@ -63,7 +63,7 @@ export default {
           return srcList.push('/' + item)
         }
         // 其他相对路径添加API前缀
-        return srcList.push(process.env.VUE_APP_BASE_API + item)
+        return srcList.push(import.meta.env.VITE_APP_BASE_API + item)
       })
       return srcList
     },

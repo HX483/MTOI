@@ -17,37 +17,40 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import icons from './requireIcons'
-export default {
-  name: 'IconSelect',
-  props: {
-    activeIcon: {
-      type: String
-    }
-  },
-  data() {
-    return {
-      name: '',
-      iconList: icons
-    }
-  },
-  methods: {
-    filterIcons() {
-      this.iconList = icons
-      if (this.name) {
-        this.iconList = this.iconList.filter(item => item.includes(this.name))
-      }
-    },
-    selectedIcon(name) {
-      this.$emit('selected', name)
-      document.body.click()
-    },
-    reset() {
-      this.name = ''
-      this.iconList = icons
-    }
+
+// 定义props
+const props = defineProps({
+  activeIcon: {
+    type: String
   }
+})
+
+// 定义事件
+const emit = defineEmits(['selected'])
+
+// 响应式数据
+const name = ref('')
+const iconList = ref(icons)
+
+// 方法
+const filterIcons = () => {
+  iconList.value = icons
+  if (name.value) {
+    iconList.value = iconList.value.filter(item => item.includes(name.value))
+  }
+}
+
+const selectedIcon = (selectedName) => {
+  emit('selected', selectedName)
+  document.body.click()
+}
+
+const reset = () => {
+  name.value = ''
+  iconList.value = icons
 }
 </script>
 
