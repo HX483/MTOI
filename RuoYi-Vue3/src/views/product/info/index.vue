@@ -3,47 +3,49 @@
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="产品名称" prop="productName">
         <el-input
-          v-model="queryParams.productName"
-          placeholder="请输入产品名称"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.productName"
+            placeholder="请输入产品名称"
+            clearable
+            @keyup.enter="handleQuery"
+            style="width: 150px;"
         />
       </el-form-item>
       <el-form-item label="价格" prop="price">
         <el-input
-          v-model="queryParams.price"
-          placeholder="请输入价格"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.price"
+            placeholder="请输入价格"
+            clearable
+            @keyup.enter="handleQuery"
+            style="width: 150px;"
         />
       </el-form-item>
       <el-form-item label="是否热销" prop="isHot">
-        <el-select v-model="queryParams.isHot" placeholder="请选择是否热销" clearable>
+        <el-select v-model="queryParams.isHot" placeholder="请选择是否热销" clearable style="width: 150px;">
           <el-option
-            v-for="dict in sys_yes_no"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in sys_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="是否新品" prop="isNew">
-        <el-select v-model="queryParams.isNew" placeholder="请选择是否新品" clearable>
+        <el-select v-model="queryParams.isNew" placeholder="请选择是否新品" clearable style="width: 150px;">
           <el-option
-            v-for="dict in sys_yes_no"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in sys_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态(1:上架,0:下架)" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态(1:上架,0:下架)" clearable>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px;">
           <el-option
-            v-for="dict in putaway_yes_no"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in putaway_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -56,40 +58,40 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['product:info:add']"
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['product:info:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['product:info:edit']"
+            type="success"
+            plain
+            icon="Edit"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['product:info:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['product:info:remove']"
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['product:info:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['product:info:export']"
+            type="warning"
+            plain
+            icon="Download"
+            @click="handleExport"
+            v-hasPermi="['product:info:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
@@ -99,7 +101,11 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="产品ID" align="center" prop="productId" />
       <el-table-column label="产品名称" align="center" prop="productName" />
-      <el-table-column label="分类ID" align="center" prop="categoryId" />
+      <el-table-column label="分类名称" align="center">
+        <template #default="scope">
+          {{ categoryMap.get(scope.row.categoryId) || '未知分类' }}
+        </template>
+      </el-table-column>
       <el-table-column label="价格" align="center" prop="price" />
       <el-table-column label="产品描述" align="center" prop="description" />
       <el-table-column label="产品图片" align="center" prop="imageUrl" width="100">
@@ -117,7 +123,7 @@
           <dict-tag :options="sys_yes_no" :value="scope.row.isNew"/>
         </template>
       </el-table-column>
-      <el-table-column label="状态(1:上架,0:下架)" align="center" prop="status">
+      <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
           <dict-tag :options="putaway_yes_no" :value="scope.row.status"/>
         </template>
@@ -139,13 +145,13 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total>0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改产品信息对话框 -->
@@ -154,8 +160,15 @@
         <el-form-item label="产品名称" prop="productName">
           <el-input v-model="form.productName" placeholder="请输入产品名称" />
         </el-form-item>
-        <el-form-item label="分类ID" prop="categoryId">
-          <el-input v-model="form.categoryId" placeholder="请输入分类ID" />
+        <el-form-item label="分类" prop="categoryId">
+          <el-select v-model="form.categoryId" placeholder="请选择分类" clearable filterable>
+            <el-option
+                v-for="category in categoryList"
+                :key="category.categoryId"
+                :label="category.categoryName"
+                :value="category.categoryId">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="价格" prop="price">
           <el-input v-model="form.price" placeholder="请输入价格" />
@@ -169,30 +182,30 @@
         <el-form-item label="是否热销" prop="isHot">
           <el-select v-model="form.isHot" placeholder="请选择是否热销">
             <el-option
-              v-for="dict in sys_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
+                v-for="dict in sys_yes_no"
+                :key="dict.value"
+                :label="dict.label"
+                :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否新品" prop="isNew">
           <el-select v-model="form.isNew" placeholder="请选择是否新品">
             <el-option
-              v-for="dict in sys_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
+                v-for="dict in sys_yes_no"
+                :key="dict.value"
+                :label="dict.label"
+                :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="状态(1:上架,0:下架)" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态(1:上架,0:下架)">
+        <el-form-item label="状态" prop="status">
+          <el-select v-model="form.status" placeholder="请选择状态">
             <el-option
-              v-for="dict in putaway_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
+                v-for="dict in putaway_yes_no"
+                :key="dict.value"
+                :label="dict.label"
+                :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -237,6 +250,7 @@
 
 <script setup name="Info">
 import { listInfo, getInfo, delInfo, addInfo, updateInfo } from "@/api/product/info"
+import {listCategory} from "../../../api/product/category.js";
 
 const { proxy } = getCurrentInstance()
 const { sys_yes_no, putaway_yes_no } = proxy.useDict('sys_yes_no', 'putaway_yes_no')
@@ -252,6 +266,8 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const categoryList = ref([])
+const categoryMap=ref(new Map())
 
 const data = reactive({
   form: {},
@@ -286,6 +302,32 @@ function getList() {
     infoList.value = response.rows
     total.value = response.total
     loading.value = false
+  })
+}
+/** 获取分类列表 */
+function getCategoryList(){
+  listCategory().then(response=>{
+    if (response && response.data) {
+      // 如果响应中有 data 字段（符合 request.js 的处理规则）
+      categoryList.value = Array.isArray(response.data) ? response.data : []
+    } else {
+      // 否则假设响应本身就是数据
+      categoryList.value = Array.isArray(response) ? response : []
+    }
+
+    // 清空旧的映射
+    categoryMap.value.clear()
+
+    // 构建新的分类映射
+    categoryList.value.forEach(category=>{
+      if (category && category.categoryId && category.categoryName) {
+        categoryMap.value.set(category.categoryId, category.categoryName)
+      }
+    })
+  }).catch(error => {
+    console.error('获取分类列表失败:', error)
+    categoryList.value = []
+    categoryMap.value.clear()
   })
 }
 
@@ -427,4 +469,5 @@ function handleExport() {
 }
 
 getList()
+getCategoryList()
 </script>
