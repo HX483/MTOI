@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.product.mapper.ProductAttributeMapper">
+    
+    <resultMap type="ProductAttribute" id="ProductAttributeResult">
+        <result property="attributeId"    column="attribute_id"    />
+        <result property="attributeName"    column="attribute_name"    />
+        <result property="attributeValue"    column="attribute_value"    />
+        <result property="productId"    column="product_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProductAttributeVo">
+        select attribute_id, attribute_name, attribute_value, product_id, create_time, update_time from product_attribute
+    </sql>
+
+    <select id="selectProductAttributeList" parameterType="ProductAttribute" resultMap="ProductAttributeResult">
+        <include refid="selectProductAttributeVo"/>
+        <where>  
+            <if test="attributeName != null  and attributeName != ''"> and attribute_name like concat('%', #{attributeName}, '%')</if>
+            <if test="attributeValue != null  and attributeValue != ''"> and attribute_value = #{attributeValue}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductAttributeByAttributeId" parameterType="Long" resultMap="ProductAttributeResult">
+        <include refid="selectProductAttributeVo"/>
+        where attribute_id = #{attributeId}
+    </select>
+
+    <insert id="insertProductAttribute" parameterType="ProductAttribute" useGeneratedKeys="true" keyProperty="attributeId">
+        insert into product_attribute
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="attributeName != null and attributeName != ''">attribute_name,</if>
+            <if test="attributeValue != null and attributeValue != ''">attribute_value,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="attributeName != null and attributeName != ''">#{attributeName},</if>
+            <if test="attributeValue != null and attributeValue != ''">#{attributeValue},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductAttribute" parameterType="ProductAttribute">
+        update product_attribute
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attributeName != null and attributeName != ''">attribute_name = #{attributeName},</if>
+            <if test="attributeValue != null and attributeValue != ''">attribute_value = #{attributeValue},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where attribute_id = #{attributeId}
+    </update>
+
+    <delete id="deleteProductAttributeByAttributeId" parameterType="Long">
+        delete from product_attribute where attribute_id = #{attributeId}
+    </delete>
+
+    <delete id="deleteProductAttributeByAttributeIds" parameterType="String">
+        delete from product_attribute where attribute_id in 
+        <foreach item="attributeId" collection="array" open="(" separator="," close=")">
+            #{attributeId}
+        </foreach>
+    </delete>
+</mapper>

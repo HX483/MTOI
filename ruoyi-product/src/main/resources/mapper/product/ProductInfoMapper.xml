@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.product.mapper.ProductInfoMapper">
+    
+    <resultMap type="ProductInfo" id="ProductInfoResult">
+        <result property="productId"    column="product_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="price"    column="price"    />
+        <result property="description"    column="description"    />
+        <result property="imageUrl"    column="image_url"    />
+        <result property="isHot"    column="is_hot"    />
+        <result property="isNew"    column="is_new"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="ProductInfoProductFormulaResult" type="ProductInfo" extends="ProductInfoResult">
+        <collection property="productFormulaList" ofType="ProductFormula" column="product_id" select="selectProductFormulaList" />
+    </resultMap>
+
+    <resultMap type="ProductFormula" id="ProductFormulaResult">
+        <result property="formulaId"    column="formula_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unit"    column="unit"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProductInfoVo">
+        select product_id, product_name, category_id, price, description, image_url, is_hot, is_new, status, create_by, create_time, update_by, update_time from product_info
+    </sql>
+
+    <select id="selectProductInfoList" parameterType="ProductInfo" resultMap="ProductInfoResult">
+        <include refid="selectProductInfoVo"/>
+        <where>  
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="isHot != null "> and is_hot = #{isHot}</if>
+            <if test="isNew != null "> and is_new = #{isNew}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductInfoByProductId" parameterType="Long" resultMap="ProductInfoProductFormulaResult">
+        select product_id, product_name, category_id, price, description, image_url, is_hot, is_new, status, create_by, create_time, update_by, update_time
+        from product_info
+        where product_id = #{productId}
+    </select>
+
+    <select id="selectProductFormulaList" resultMap="ProductFormulaResult">
+        select formula_id, product_id, material_id, quantity, unit, create_time, update_time
+        from product_formula
+        where product_id = #{product_id}
+    </select>
+
+    <insert id="insertProductInfo" parameterType="ProductInfo" useGeneratedKeys="true" keyProperty="productId">
+        insert into product_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="price != null">price,</if>
+            <if test="description != null">description,</if>
+            <if test="imageUrl != null">image_url,</if>
+            <if test="isHot != null">is_hot,</if>
+            <if test="isNew != null">is_new,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="price != null">#{price},</if>
+            <if test="description != null">#{description},</if>
+            <if test="imageUrl != null">#{imageUrl},</if>
+            <if test="isHot != null">#{isHot},</if>
+            <if test="isNew != null">#{isNew},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductInfo" parameterType="ProductInfo">
+        update product_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productName != null and productName != ''">product_name = #{productName},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="isHot != null">is_hot = #{isHot},</if>
+            <if test="isNew != null">is_new = #{isNew},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where product_id = #{productId}
+    </update>
+
+    <delete id="deleteProductInfoByProductId" parameterType="Long">
+        delete from product_info where product_id = #{productId}
+    </delete>
+
+    <delete id="deleteProductInfoByProductIds" parameterType="String">
+        delete from product_info where product_id in 
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteProductFormulaByProductIds" parameterType="String">
+        delete from product_formula where product_id in 
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteProductFormulaByProductId" parameterType="Long">
+        delete from product_formula where product_id = #{productId}
+    </delete>
+
+    <insert id="batchProductFormula">
+        insert into product_formula( formula_id, product_id, material_id, quantity, unit, create_time, update_time) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.formulaId}, #{item.productId}, #{item.materialId}, #{item.quantity}, #{item.unit}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

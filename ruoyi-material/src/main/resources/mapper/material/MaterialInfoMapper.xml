@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.material.mapper.MaterialInfoMapper">
+    
+    <resultMap type="MaterialInfo" id="MaterialInfoResult">
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="specification"    column="specification"    />
+        <result property="unit"    column="unit"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="purchasePrice"    column="purchase_price"    />
+        <result property="shelfLife"    column="shelf_life"    />
+        <result property="warningDays"    column="warning_days"    />
+        <result property="status"    column="status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="MaterialInfoSupplierResult" type="MaterialInfo" extends="MaterialInfoResult">
+        <collection property="supplierList" ofType="Supplier" column="material_id" select="selectSupplierList" />
+    </resultMap>
+
+    <resultMap type="Supplier" id="SupplierResult">
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="contactPerson"    column="contact_person"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="email"    column="email"    />
+        <result property="address"    column="address"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectMaterialInfoVo">
+        select material_id, material_name, category_id, specification, unit, supplier_id, purchase_price, shelf_life, warning_days, status, create_by, create_time, update_by, update_time from material_info
+    </sql>
+
+    <select id="selectMaterialInfoList" parameterType="MaterialInfo" resultMap="MaterialInfoResult">
+        <include refid="selectMaterialInfoVo"/>
+        <where>  
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="categoryId != null "> and category_id = #{categoryId}</if>
+            <if test="specification != null  and specification != ''"> and specification = #{specification}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="purchasePrice != null "> and purchase_price = #{purchasePrice}</if>
+            <if test="shelfLife != null "> and shelf_life = #{shelfLife}</if>
+            <if test="warningDays != null "> and warning_days = #{warningDays}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectMaterialInfoByMaterialId" parameterType="Long" resultMap="MaterialInfoSupplierResult">
+        select material_id, material_name, category_id, specification, unit, supplier_id, purchase_price, shelf_life, warning_days, status, create_by, create_time, update_by, update_time
+        from material_info
+        where material_id = #{materialId}
+    </select>
+
+    <select id="selectSupplierList" resultMap="SupplierResult">
+        select supplier_id, supplier_name, contact_person, contact_phone, email, address, status, create_time, update_time
+        from supplier
+        where supplier_id = #{supplier_id}
+    </select>
+
+    <insert id="insertMaterialInfo" parameterType="MaterialInfo" useGeneratedKeys="true" keyProperty="materialId">
+        insert into material_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialName != null and materialName != ''">material_name,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="specification != null">specification,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="purchasePrice != null">purchase_price,</if>
+            <if test="shelfLife != null">shelf_life,</if>
+            <if test="warningDays != null">warning_days,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialName != null and materialName != ''">#{materialName},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="specification != null">#{specification},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="purchasePrice != null">#{purchasePrice},</if>
+            <if test="shelfLife != null">#{shelfLife},</if>
+            <if test="warningDays != null">#{warningDays},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMaterialInfo" parameterType="MaterialInfo">
+        update material_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="specification != null">specification = #{specification},</if>
+            <if test="unit != null and unit != ''">unit = #{unit},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="purchasePrice != null">purchase_price = #{purchasePrice},</if>
+            <if test="shelfLife != null">shelf_life = #{shelfLife},</if>
+            <if test="warningDays != null">warning_days = #{warningDays},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where material_id = #{materialId}
+    </update>
+
+    <delete id="deleteMaterialInfoByMaterialId" parameterType="Long">
+        delete from material_info where material_id = #{materialId}
+    </delete>
+
+    <delete id="deleteMaterialInfoByMaterialIds" parameterType="String">
+        delete from material_info where material_id in 
+        <foreach item="materialId" collection="array" open="(" separator="," close=")">
+            #{materialId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSupplierBySupplierIds" parameterType="String">
+        delete from supplier where supplier_id in 
+        <foreach item="supplierId" collection="array" open="(" separator="," close=")">
+            #{supplierId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSupplierBySupplierId" parameterType="Long">
+        delete from supplier where supplier_id = #{supplierId}
+    </delete>
+
+    <insert id="batchSupplier">
+        insert into supplier( supplier_id, supplier_name, contact_person, contact_phone, email, address, status, create_time, update_time) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.supplierId}, #{item.supplierName}, #{item.contactPerson}, #{item.contactPhone}, #{item.email}, #{item.address}, #{item.status}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

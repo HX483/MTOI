@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.product.mapper.ProductFormulaMapper">
+    
+    <resultMap type="ProductFormula" id="ProductFormulaResult">
+        <result property="formulaId"    column="formula_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unit"    column="unit"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProductFormulaVo">
+        select formula_id, product_id, material_id, quantity, unit, create_time, update_time from product_formula
+    </sql>
+
+    <select id="selectProductFormulaList" parameterType="ProductFormula" resultMap="ProductFormulaResult">
+        <include refid="selectProductFormulaVo"/>
+        <where>  
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductFormulaByFormulaId" parameterType="Long" resultMap="ProductFormulaResult">
+        <include refid="selectProductFormulaVo"/>
+        where formula_id = #{formulaId}
+    </select>
+
+    <insert id="insertProductFormula" parameterType="ProductFormula" useGeneratedKeys="true" keyProperty="formulaId">
+        insert into product_formula
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductFormula" parameterType="ProductFormula">
+        update product_formula
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="unit != null and unit != ''">unit = #{unit},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where formula_id = #{formulaId}
+    </update>
+
+    <delete id="deleteProductFormulaByFormulaId" parameterType="Long">
+        delete from product_formula where formula_id = #{formulaId}
+    </delete>
+
+    <delete id="deleteProductFormulaByFormulaIds" parameterType="String">
+        delete from product_formula where formula_id in 
+        <foreach item="formulaId" collection="array" open="(" separator="," close=")">
+            #{formulaId}
+        </foreach>
+    </delete>
+</mapper>
