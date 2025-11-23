@@ -1,5 +1,6 @@
 package com.ruoyi.product.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import com.ruoyi.product.domain.ProductFormula;
 import com.ruoyi.product.mapper.ProductInfoMapper;
 import com.ruoyi.product.domain.ProductInfo;
 import com.ruoyi.product.service.IProductInfoService;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * 产品信息Service业务层处理
@@ -59,9 +61,14 @@ public class ProductInfoServiceImpl implements IProductInfoService
     public int insertProductInfo(ProductInfo productInfo)
     {
         productInfo.setCreateTime(DateUtils.getNowDate());
-        int rows = productInfoMapper.insertProductInfo(productInfo);
-        insertProductFormula(productInfo);
-        return rows;
+        try {
+            int rows = productInfoMapper.insertProductInfo(productInfo);
+            insertProductFormula(productInfo);
+            return rows;
+        } catch (DuplicateKeyException e) {
+            // 捕获重复键异常，重新抛出为运行时异常，附带友好的错误消息
+            throw new RuntimeException("产品名称已存在，请使用其他名称");
+        }
     }
 
     /**
@@ -75,9 +82,14 @@ public class ProductInfoServiceImpl implements IProductInfoService
     public int updateProductInfo(ProductInfo productInfo)
     {
         productInfo.setUpdateTime(DateUtils.getNowDate());
-        productInfoMapper.deleteProductFormulaByProductId(productInfo.getProductId());
-        insertProductFormula(productInfo);
-        return productInfoMapper.updateProductInfo(productInfo);
+        try {
+            productInfoMapper.deleteProductFormulaByProductId(productInfo.getProductId());
+            insertProductFormula(productInfo);
+            return productInfoMapper.updateProductInfo(productInfo);
+        } catch (DuplicateKeyException e) {
+            // 捕获重复键异常，重新抛出为运行时异常，附带友好的错误消息
+            throw new RuntimeException("产品名称已存在，请使用其他名称");
+        }
     }
 
     /**
@@ -115,14 +127,17 @@ public class ProductInfoServiceImpl implements IProductInfoService
      */
     public void insertProductFormula(ProductInfo productInfo)
     {
-        List<ProductFormula> productFormulaList = productInfo.getProductFormulaList();
         Long productId = productInfo.getProductId();
+        List<ProductFormula> productFormulaList = productInfo.getProductFormulaList();
         if (StringUtils.isNotNull(productFormulaList))
         {
             List<ProductFormula> list = new ArrayList<ProductFormula>();
+            Date now = DateUtils.getNowDate();
             for (ProductFormula productFormula : productFormulaList)
             {
                 productFormula.setProductId(productId);
+                productFormula.setCreateTime(now);
+                productFormula.setUpdateTime(now);
                 list.add(productFormula);
             }
             if (list.size() > 0)

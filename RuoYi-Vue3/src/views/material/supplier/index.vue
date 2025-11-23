@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="供应商名称" prop="supplierName">
+      <el-form-item label="供应商名称" prop="supplierName" label-width="90px">
         <el-input
           v-model="queryParams.supplierName"
           placeholder="请输入供应商名称"
@@ -18,7 +18,7 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px;">
           <el-option
             v-for="dict in sys_normal_disable"
             :key="dict.value"

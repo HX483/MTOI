@@ -3,49 +3,49 @@
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="产品名称" prop="productName">
         <el-input
-            v-model="queryParams.productName"
-            placeholder="请输入产品名称"
-            clearable
-            @keyup.enter="handleQuery"
-            style="width: 150px;"
+          v-model="queryParams.productName"
+          placeholder="请输入产品名称"
+          clearable
+          @keyup.enter="handleQuery"
+          style="width: 150px;"
         />
       </el-form-item>
       <el-form-item label="价格" prop="price">
         <el-input
-            v-model="queryParams.price"
-            placeholder="请输入价格"
-            clearable
-            @keyup.enter="handleQuery"
-            style="width: 150px;"
+          v-model="queryParams.price"
+          placeholder="请输入价格"
+          clearable
+          @keyup.enter="handleQuery"
+          style="width: 150px;"
         />
       </el-form-item>
       <el-form-item label="是否热销" prop="isHot">
         <el-select v-model="queryParams.isHot" placeholder="请选择是否热销" clearable style="width: 150px;">
           <el-option
-              v-for="dict in sys_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
+            v-for="dict in sys_yes_no"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="是否新品" prop="isNew">
         <el-select v-model="queryParams.isNew" placeholder="请选择是否新品" clearable style="width: 150px;">
           <el-option
-              v-for="dict in sys_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
+            v-for="dict in sys_yes_no"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px;">
           <el-option
-              v-for="dict in putaway_yes_no"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
+            v-for="dict in putaway_yes_no"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -58,40 +58,40 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-            type="primary"
-            plain
-            icon="Plus"
-            @click="handleAdd"
-            v-hasPermi="['product:info:add']"
+          type="primary"
+          plain
+          icon="Plus"
+          @click="handleAdd"
+          v-hasPermi="['product:info:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="success"
-            plain
-            icon="Edit"
-            :disabled="single"
-            @click="handleUpdate"
-            v-hasPermi="['product:info:edit']"
+          type="success"
+          plain
+          icon="Edit"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['product:info:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="danger"
-            plain
-            icon="Delete"
-            :disabled="multiple"
-            @click="handleDelete"
-            v-hasPermi="['product:info:remove']"
+          type="danger"
+          plain
+          icon="Delete"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['product:info:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-            type="warning"
-            plain
-            icon="Download"
-            @click="handleExport"
-            v-hasPermi="['product:info:export']"
+          type="warning"
+          plain
+          icon="Download"
+          @click="handleExport"
+          v-hasPermi="['product:info:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
@@ -101,9 +101,9 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="产品ID" align="center" prop="productId" />
       <el-table-column label="产品名称" align="center" prop="productName" />
-      <el-table-column label="分类名称" align="center">
+      <el-table-column label="分类名称" align="center" prop="categoryId">
         <template #default="scope">
-          {{ categoryMap.get(scope.row.categoryId) || '未知分类' }}
+          {{ categoryMap.get(scope.row.categoryId) || scope.row.categoryId }}
         </template>
       </el-table-column>
       <el-table-column label="价格" align="center" prop="price" />
@@ -145,17 +145,17 @@
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination
-        v-show="total>0"
-        :total="total"
-        v-model:page="queryParams.pageNum"
-        v-model:limit="queryParams.pageSize"
-        @pagination="getList"
+      v-show="total>0"
+      :total="total"
+      v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
     />
 
     <!-- 添加或修改产品信息对话框 -->
-    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+    <el-dialog :title="title" v-model="open" width="800px" append-to-body>
       <el-form ref="infoRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="产品名称" prop="productName">
           <el-input v-model="form.productName" placeholder="请输入产品名称" />
@@ -182,30 +182,30 @@
         <el-form-item label="是否热销" prop="isHot">
           <el-select v-model="form.isHot" placeholder="请选择是否热销">
             <el-option
-                v-for="dict in sys_yes_no"
-                :key="dict.value"
-                :label="dict.label"
-                :value="parseInt(dict.value)"
+              v-for="dict in sys_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否新品" prop="isNew">
           <el-select v-model="form.isNew" placeholder="请选择是否新品">
             <el-option
-                v-for="dict in sys_yes_no"
-                :key="dict.value"
-                :label="dict.label"
-                :value="parseInt(dict.value)"
+              v-for="dict in sys_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择状态">
             <el-option
-                v-for="dict in putaway_yes_no"
-                :key="dict.value"
-                :label="dict.label"
-                :value="parseInt(dict.value)"
+              v-for="dict in putaway_yes_no"
+              :key="dict.value"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -221,9 +221,23 @@
         <el-table :data="productFormulaList" :row-class-name="rowProductFormulaIndex" @selection-change="handleProductFormulaSelectionChange" ref="productFormula">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50"/>
-          <el-table-column label="原料ID" prop="materialId" width="150">
+          <el-table-column label="原料" prop="materialId" width="200">
             <template #default="scope">
-              <el-input v-model="scope.row.materialId" placeholder="请输入原料ID" />
+              <el-select 
+                v-model="scope.row.materialId" 
+                placeholder="请选择原料" 
+                filterable
+                clearable
+                style="width: 100%"
+                @change="handleMaterialChange(scope.row)"
+              >
+                <el-option
+                  v-for="material in materialList"
+                  :key="material.materialId"
+                  :label="material.materialName"
+                  :value="material.materialId">
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
           <el-table-column label="用量" prop="quantity" width="150">
@@ -233,7 +247,7 @@
           </el-table-column>
           <el-table-column label="单位" prop="unit" width="150">
             <template #default="scope">
-              <el-input v-model="scope.row.unit" placeholder="请输入单位" />
+              <el-input v-model="scope.row.unit" placeholder="请输入单位" readonly />
             </template>
           </el-table-column>
         </el-table>
@@ -250,6 +264,7 @@
 
 <script setup name="Info">
 import { listInfo, getInfo, delInfo, addInfo, updateInfo } from "@/api/product/info"
+import { listInfo as listMaterialInfo } from "@/api/material/info"
 import {listCategory} from "../../../api/product/category.js";
 
 const { proxy } = getCurrentInstance()
@@ -257,6 +272,8 @@ const { sys_yes_no, putaway_yes_no } = proxy.useDict('sys_yes_no', 'putaway_yes_
 
 const infoList = ref([])
 const productFormulaList = ref([])
+const materialList = ref([])
+const materialMap = ref(new Map())
 const open = ref(false)
 const loading = ref(true)
 const showSearch = ref(true)
@@ -285,7 +302,7 @@ const data = reactive({
       { required: true, message: "产品名称不能为空", trigger: "blur" }
     ],
     categoryId: [
-      { required: true, message: "分类ID不能为空", trigger: "blur" }
+      { required: true, message: "分类不能为空", trigger: "change" }
     ],
     price: [
       { required: true, message: "价格不能为空", trigger: "blur" }
@@ -304,31 +321,42 @@ function getList() {
     loading.value = false
   })
 }
+
 /** 获取分类列表 */
 function getCategoryList(){
   listCategory().then(response=>{
-    if (response && response.data) {
-      // 如果响应中有 data 字段（符合 request.js 的处理规则）
-      categoryList.value = Array.isArray(response.data) ? response.data : []
-    } else {
-      // 否则假设响应本身就是数据
-      categoryList.value = Array.isArray(response) ? response : []
-    }
-
-    // 清空旧的映射
-    categoryMap.value.clear()
-
-    // 构建新的分类映射
+    categoryList.value = response.data
     categoryList.value.forEach(category=>{
-      if (category && category.categoryId && category.categoryName) {
-        categoryMap.value.set(category.categoryId, category.categoryName)
-      }
+      categoryMap.value.set(category.categoryId, category.categoryName)
     })
-  }).catch(error => {
-    console.error('获取分类列表失败:', error)
-    categoryList.value = []
-    categoryMap.value.clear()
   })
+}
+
+/** 获取原料列表 */
+function getMaterialList() {
+  listMaterialInfo().then(response => {
+    materialList.value = response.rows
+    // 清空旧的映射
+    materialMap.value.clear()
+    materialList.value.forEach(material => {
+      materialMap.value.set(material.materialId, {
+        materialName: material.materialName,
+        unit: material.unit
+      })
+    })
+  })
+}
+
+// 处理原料选择变化
+function handleMaterialChange(row) {
+  if (row.materialId) {
+    const material = materialMap.value.get(row.materialId)
+    if (material) {
+      row.unit = material.unit
+    }
+  } else {
+    row.unit = ""
+  }
 }
 
 // 取消按钮
@@ -380,6 +408,7 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
+  getMaterialList()
   open.value = true
   title.value = "添加产品信息"
 }
@@ -387,6 +416,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
+  getMaterialList()
   const _productId = row.productId || ids.value
   getInfo(_productId).then(response => {
     form.value = response.data
@@ -398,6 +428,31 @@ function handleUpdate(row) {
 
 /** 提交按钮 */
 function submitForm() {
+  // 验证产品配方数据
+  let isValid = true;
+  for (let i = 0; i < productFormulaList.value.length; i++) {
+    const formula = productFormulaList.value[i];
+    if (formula.materialId === "" || formula.materialId === null || formula.materialId === undefined) {
+      proxy.$modal.msgError("第" + (i + 1) + "行产品配方的原料不能为空");
+      isValid = false;
+      break;
+    }
+    if (formula.quantity === "" || formula.quantity === null || formula.quantity === undefined) {
+      proxy.$modal.msgError("第" + (i + 1) + "行产品配方的用量不能为空");
+      isValid = false;
+      break;
+    }
+    if (formula.unit === "" || formula.unit === null || formula.unit === undefined) {
+      proxy.$modal.msgError("第" + (i + 1) + "行产品配方的单位不能为空");
+      isValid = false;
+      break;
+    }
+  }
+  
+  if (!isValid) {
+    return;
+  }
+  
   proxy.$refs["infoRef"].validate(valid => {
     if (valid) {
       form.value.productFormulaList = productFormulaList.value
@@ -406,12 +461,26 @@ function submitForm() {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false
           getList()
+        }).catch(error => {
+          // 捕获并显示友好的错误消息
+          if (error.response && error.response.data && error.response.data.msg) {
+            proxy.$modal.msgError(error.response.data.msg)
+          } else {
+            proxy.$modal.msgError("修改失败，请稍后重试")
+          }
         })
       } else {
         addInfo(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
           getList()
+        }).catch(error => {
+          // 捕获并显示友好的错误消息
+          if (error.response && error.response.data && error.response.data.msg) {
+            proxy.$modal.msgError(error.response.data.msg)
+          } else {
+            proxy.$modal.msgError("新增失败，请稍后重试")
+          }
         })
       }
     }
@@ -468,6 +537,6 @@ function handleExport() {
   }, `info_${new Date().getTime()}.xlsx`)
 }
 
-getList()
 getCategoryList()
+getList()
 </script>

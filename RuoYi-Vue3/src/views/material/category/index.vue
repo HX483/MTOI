@@ -18,7 +18,7 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px;">
           <el-option
             v-for="dict in sys_normal_disable"
             :key="dict.value"
@@ -62,6 +62,7 @@
       :default-expand-all="isExpandAll"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
+      <el-table-column label="分类ID" prop="categoryId" />
       <el-table-column label="分类名称" prop="categoryName" />
       <el-table-column label="父分类ID" align="center" prop="parentId" />
       <el-table-column label="显示顺序" align="center" prop="orderNum" />
@@ -95,13 +96,13 @@
         <el-form-item label="分类名称" prop="categoryName">
           <el-input v-model="form.categoryName" placeholder="请输入分类名称" />
         </el-form-item>
-        <el-form-item label="父分类ID" prop="parentId">
+        <el-form-item label="父分类名称" prop="parentId">
           <el-tree-select
             v-model="form.parentId"
             :data="categoryOptions"
             :props="{ value: 'categoryId', label: 'categoryName', children: 'children' }"
             value-key="categoryId"
-            placeholder="请选择父分类ID"
+            placeholder="请选择父分类"
             check-strictly
           />
         </el-form-item>

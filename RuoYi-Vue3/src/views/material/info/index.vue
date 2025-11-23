@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+
       <el-form-item label="原料名称" prop="materialName">
         <el-input
           v-model="queryParams.materialName"
@@ -9,21 +10,35 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="分类ID" prop="categoryId">
-        <el-input
+      <el-form-item label="分类" prop="categoryId">
+        <el-select
           v-model="queryParams.categoryId"
-          placeholder="请输入分类ID"
+          placeholder="请选择分类"
           clearable
-          @keyup.enter="handleQuery"
-        />
+          filterable
+        >
+          <el-option
+            v-for="item in categoryList"
+            :key="item.categoryId"
+            :label="item.categoryName"
+            :value="item.categoryId"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="供应商ID" prop="supplierId">
-        <el-input
+      <el-form-item label="供应商" prop="supplierId">
+        <el-select
           v-model="queryParams.supplierId"
-          placeholder="请输入供应商ID"
+          placeholder="请选择供应商"
           clearable
-          @keyup.enter="handleQuery"
-        />
+          filterable
+        >
+          <el-option
+            v-for="item in supplierList"
+            :key="item.supplierId"
+            :label="item.supplierName"
+            :value="item.supplierId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="采购单价" prop="purchasePrice">
         <el-input
@@ -33,7 +48,7 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="保质期(天)" prop="shelfLife">
+      <el-form-item label="保质期" prop="shelfLife">
         <el-input
           v-model="queryParams.shelfLife"
           placeholder="请输入保质期(天)"
@@ -50,7 +65,7 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px;">
           <el-option
             v-for="dict in sys_normal_disable"
             :key="dict.value"
@@ -111,10 +126,18 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="原料ID" align="center" prop="materialId" />
       <el-table-column label="原料名称" align="center" prop="materialName" />
-      <el-table-column label="分类ID" align="center" prop="categoryId" />
+      <el-table-column label="分类" align="center" prop="categoryId" >
+        <template #default="scope">
+          {{categoryMap.get(scope.row.categoryId)||scope.row.categoryId}}
+        </template>
+      </el-table-column>
       <el-table-column label="规格" align="center" prop="specification" />
       <el-table-column label="单位" align="center" prop="unit" />
-      <el-table-column label="供应商ID" align="center" prop="supplierId" />
+      <el-table-column label="供应商" align="center" prop="supplierId" >
+        <template #default="scope">
+          {{supplierMap.get(scope.row.supplierId)||scope.row.supplierId}}
+        </template>
+      </el-table-column>
       <el-table-column label="采购单价" align="center" prop="purchasePrice" />
       <el-table-column label="保质期(天)" align="center" prop="shelfLife" />
       <el-table-column label="预警天数" align="center" prop="warningDays" />
@@ -155,8 +178,16 @@
         <el-form-item label="原料名称" prop="materialName">
           <el-input v-model="form.materialName" placeholder="请输入原料名称" />
         </el-form-item>
-        <el-form-item label="分类ID" prop="categoryId">
-          <el-input v-model="form.categoryId" placeholder="请输入分类ID" />
+        <el-form-item label="分类" prop="categoryId">
+          <el-select v-model="form.categoryId" placeholder="请选择分类">
+            <el-option
+              v-for="item in categoryList"
+              :key="item.categoryId"
+              :label="item.categoryName"
+              :value="item.categoryId"
+            ></el-option>
+          </el-select>
+
         </el-form-item>
         <el-form-item label="规格" prop="specification">
           <el-input v-model="form.specification" placeholder="请输入规格" />
@@ -164,8 +195,15 @@
         <el-form-item label="单位" prop="unit">
           <el-input v-model="form.unit" placeholder="请输入单位" />
         </el-form-item>
-        <el-form-item label="供应商ID" prop="supplierId">
-          <el-input v-model="form.supplierId" placeholder="请输入供应商ID" />
+        <el-form-item label="供应商" prop="supplierId">
+          <el-select v-model="form.supplierId" placeholder="请选择供应商" clearable filterable>
+            <el-option
+              v-for="item in supplierList"
+              :key="item.supplierId"
+              :label="item.supplierName"
+              :value="item.supplierId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="采购单价" prop="purchasePrice">
           <el-input v-model="form.purchasePrice" placeholder="请输入采购单价" />
@@ -258,6 +296,8 @@
 
 <script setup name="Info">
 import { listInfo, getInfo, delInfo, addInfo, updateInfo } from "@/api/material/info"
+import {listCategory} from "@/api/material/category"
+import {listSupplier} from "@/api/material/supplier"
 
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable')
@@ -273,6 +313,9 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const categoryList = ref([])
+const categoryMap = ref(new Map())
+const supplierMap = ref(new Map())
 
 const data = reactive({
   form: {},
@@ -292,7 +335,7 @@ const data = reactive({
       { required: true, message: "原料名称不能为空", trigger: "blur" }
     ],
     categoryId: [
-      { required: true, message: "分类ID不能为空", trigger: "blur" }
+      { required: true, message: "原料分类不能为空", trigger: "change" }
     ],
     specification: [
       { required: true, message: "规格不能为空", trigger: "blur" }
@@ -301,12 +344,42 @@ const data = reactive({
       { required: true, message: "单位不能为空", trigger: "blur" }
     ],
     supplierId: [
-      { required: true, message: "供应商ID不能为空", trigger: "blur" }
+      { required: true, message: "供应商不能为空", trigger: "change" }
     ],
   }
 })
 
 const { queryParams, form, rules } = toRefs(data)
+
+/** 查询分类信息列表 */
+function getCategoryList() {
+  listCategory().then(response => {
+    if (response && response.data) {
+      categoryList.value = response.data
+      categoryList.value.forEach(item => {
+        categoryMap.value.set(item.categoryId, item.categoryName)
+      })
+    }
+  }).catch(error => {
+    console.error('获取分类列表失败:', error)
+    categoryList.value = []
+  })
+}
+
+/** 查询供应商列表 */
+function getSupplierList() {
+  listSupplier().then(response => {
+    if (response && response.rows) {
+      supplierList.value = response.rows
+      supplierList.value.forEach(item => {
+        supplierMap.value.set(item.supplierId, item.supplierName)
+      })
+    }
+  }).catch(error => {
+    console.error('获取供应商列表失败:', error)
+    supplierList.value = []
+  })
+}
 
 /** 查询原料信息列表 */
 function getList() {
@@ -368,6 +441,7 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset()
+  getSupplierList()
   open.value = true
   title.value = "添加原料信息"
 }
@@ -375,6 +449,7 @@ function handleAdd() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset()
+  getSupplierList()
   const _materialId = row.materialId || ids.value
   getInfo(_materialId).then(response => {
     form.value = response.data
@@ -458,6 +533,7 @@ function handleExport() {
     ...queryParams.value
   }, `info_${new Date().getTime()}.xlsx`)
 }
-
+getCategoryList()
+getSupplierList()
 getList()
 </script>
