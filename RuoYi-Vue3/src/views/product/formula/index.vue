@@ -198,6 +198,10 @@ const title = ref("")
 const productList = ref([])
 const materialList = ref([])
 
+// 正确地声明表单引用
+const formulaRef = ref(null)
+const queryRef = ref(null)
+
 // 1. 改用reactive包裹Map，提升响应式灵敏度
 const productMap = reactive(new Map())
 const materialMap = reactive(new Map())
@@ -318,7 +322,6 @@ function reset() {
     updateTime: null
   }
   // 修复：使用正确的表单重置方式（避免proxy依赖）
-  const formulaRef = ref(null)
   if (formulaRef.value) {
     formulaRef.value.resetFields()
   }
@@ -333,7 +336,6 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   // 修复：使用正确的表单重置方式
-  const queryRef = ref(null)
   if (queryRef.value) {
     queryRef.value.resetFields()
   }
@@ -372,20 +374,22 @@ function handleUpdate(row) {
 
 /** 提交按钮 - 优化成功后刷新逻辑 */
 function submitForm() {
-  const formulaRef = ref(null)
-  formulaRef.value.validate(valid => {
-    if (valid) {
-      const request = form.value.formulaId ? updateFormula(form.value) : addFormula(form.value)
-      request.then(response => {
-        proxy.$modal.msgSuccess(form.value.formulaId ? "修改成功" : "新增成功")
-        open.value = false
-        // 4. 延迟500ms刷新（确保数据库已同步新数据）
-        setTimeout(() => {
-          getList()
-        }, 500)
-      })
-    }
-  })
+  // 修复：正确使用表单引用
+  if (formulaRef.value) {
+    formulaRef.value.validate(valid => {
+      if (valid) {
+        const request = form.value.formulaId ? updateFormula(form.value) : addFormula(form.value)
+        request.then(response => {
+          proxy.$modal.msgSuccess(form.value.formulaId ? "修改成功" : "新增成功")
+          open.value = false
+          // 4. 延迟500ms刷新（确保数据库已同步新数据）
+          setTimeout(() => {
+            getList()
+          }, 500)
+        })
+      }
+    })
+  }
 }
 
 /** 删除按钮操作 - 修复ids取值问题 */

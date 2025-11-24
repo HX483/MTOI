@@ -122,7 +122,8 @@ public class MaterialInfoServiceImpl implements IMaterialInfoService
             List<Supplier> list = new ArrayList<Supplier>();
             for (Supplier supplier : supplierList)
             {
-                supplier.setSupplierId(materialId);
+                // 修复：使用独立的主键，而不是复用materialId
+                // supplier.setSupplierId(materialId);
                 list.add(supplier);
             }
             if (list.size() > 0)
