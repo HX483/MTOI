@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.report.mapper.ReportMapper">
+    
+    <!-- 获取总库存数量 -->
+    <select id="getTotalStockQuantity" resultType="Long">
+        SELECT COALESCE(SUM(quantity), 0) FROM stock_info
+    </select>
+
+    <!-- 获取总库存价值 -->
+    <select id="getTotalStockValue" resultType="Double">
+        SELECT COALESCE(SUM(si.quantity * mi.purchase_price), 0) 
+        FROM stock_info si
+        LEFT JOIN material_info mi ON si.material_id = mi.material_id
+    </select>
+
+    <!-- 获取仓库数量 -->
+    <select id="getWarehouseCount" resultType="Long">
+        SELECT COUNT(*) FROM warehouse WHERE status = 1
+    </select>
+
+    <!-- 获取原料种类数 -->
+    <select id="getMaterialCount" resultType="Long">
+        SELECT COUNT(DISTINCT material_id) FROM stock_info
+    </select>
+
+    <!-- 获取预警数量 -->
+    <select id="getAlertCount" resultType="Long">
+        SELECT COUNT(*) FROM stock_info 
+        WHERE quantity &lt;= alert_threshold
+    </select>
+
+    <!-- 按仓库统计库存 -->
+    <select id="getStockByWarehouse" resultType="java.util.HashMap">
+        SELECT 
+            w.warehouse_id,
+            w.warehouse_name,
+            COALESCE(SUM(si.quantity), 0) as total_quantity,
+            COUNT(DISTINCT si.material_id) as material_count
+        FROM warehouse w
+        LEFT JOIN stock_info si ON w.warehouse_id = si.warehouse_id
+        WHERE w.status = 1
+        GROUP BY w.warehouse_id, w.warehouse_name
+        ORDER BY total_quantity DESC
+    </select>
+
+    <!-- 获取库存预警列表 -->
+    <select id="getStockAlert" resultType="java.util.HashMap">
+        SELECT 
+            si.stock_id,
+            si.material_id,
+            mi.material_name,
+            si.quantity,
+            si.alert_threshold,
+            si.location,
+            w.warehouse_name
+        FROM stock_info si
+        LEFT JOIN material_info mi ON si.material_id = mi.material_id
+        LEFT JOIN warehouse w ON si.warehouse_id = w.warehouse_id
+        WHERE si.quantity &lt;= si.alert_threshold
+        ORDER BY (si.quantity - si.alert_threshold) ASC
+    </select>
+
+    <!-- 获取盘点总数 -->
+    <select id="getTotalChecks" resultType="Long">
+        SELECT COUNT(*) FROM stock_check
+    </select>
+
+    <!-- 获取进行中的盘点数 -->
+    <select id="getOngoingChecks" resultType="Long">
+        SELECT COUNT(*) FROM stock_check WHERE status = 1
+    </select>
+
+    <!-- 获取已完成的盘点数 -->
+    <select id="getCompletedChecks" resultType="Long">
+        SELECT COUNT(*) FROM stock_check WHERE status = 2
+    </select>
+
+    <!-- 获取总差异数量 -->
+    <select id="getTotalDiscrepancy" resultType="Long">
+        SELECT COALESCE(SUM(discrepancy_count), 0) FROM stock_check
+    </select>
+
+    <!-- 获取盘点明细统计 -->
+    <select id="getCheckDetails" resultType="java.util.HashMap">
+        SELECT 
+            sc.check_id,
+            sc.check_no,
+            sc.check_date,
+            sc.total_count,
+            sc.discrepancy_count,
+            w.warehouse_name,
+            CASE sc.status
+                WHEN 1 THEN '进行中'
+                WHEN 2 THEN '已完成'
+                WHEN 3 THEN '已取消'
+                ELSE '未知'
+            END as status_name
+        FROM stock_check sc
+        LEFT JOIN warehouse w ON sc.warehouse_id = w.warehouse_id
+        ORDER BY sc.check_date DESC
+        LIMIT 10
+    </select>
+
+    <!-- 获取原料使用分析 -->
+    <select id="getMaterialUsage" resultType="java.util.HashMap">
+        SELECT 
+            mi.material_id,
+            mi.material_name,
+            mi.specification,
+            COALESCE(SUM(si.quantity), 0) as total_quantity,
+            COUNT(DISTINCT si.warehouse_id) as warehouse_count,
+            COALESCE(SUM(pf.quantity), 0) as used_in_products
+        FROM material_info mi
+        LEFT JOIN stock_info si ON mi.material_id = si.material_id
+        LEFT JOIN product_formula pf ON mi.material_id = pf.material_id
+        GROUP BY mi.material_id, mi.material_name, mi.specification
+        ORDER BY total_quantity DESC
+    </select>
+
+    <!-- 获取产品总数 -->
+    <select id="getTotalProducts" resultType="Long">
+        SELECT COUNT(*) FROM product_info
+    </select>
+
+    <!-- 获取上架产品数 -->
+    <select id="getOnSaleProducts" resultType="Long">
+        SELECT COUNT(*) FROM product_info WHERE status = 1
+    </select>
+
+    <!-- 获取热销产品数 -->
+    <select id="getHotProducts" resultType="Long">
+        SELECT COUNT(*) FROM product_info WHERE is_hot = 1 AND status = 1
+    </select>
+
+    <!-- 按分类统计产品 -->
+    <select id="getProductByCategory" resultType="java.util.HashMap">
+        SELECT 
+            pc.category_id,
+            pc.category_name,
+            COUNT(pi.product_id) as product_count,
+            COALESCE(SUM(CASE WHEN pi.status = 1 THEN 1 ELSE 0 END), 0) as on_sale_count
+        FROM product_category pc
+        LEFT JOIN product_info pi ON pc.category_id = pi.category_id
+        WHERE pc.status = 1
+        GROUP BY pc.category_id, pc.category_name
+        ORDER BY product_count DESC
+    </select>
+
+</mapper>
+

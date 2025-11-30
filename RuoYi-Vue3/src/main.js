@@ -43,6 +43,20 @@ import ImageUpload from "@/components/ImageUpload"
 import ImagePreview from "@/components/ImagePreview"
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+// 引入 vue-echarts 组件
+import ECharts from 'vue-echarts'
+// 引入 ECharts 核心模块和需要的图表类型
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers' // 修复导入路径
+import { BarChart, PieChart, LineChart } from 'echarts/charts' // 柱状图、饼图、折线图
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components' // 辅助组件（网格、图例、提示框）
+
+// 注册 ECharts 模块
+use([
+  CanvasRenderer, // 渲染器（必须）
+  BarChart, PieChart, LineChart, // 图表类型
+  GridComponent, LegendComponent, TooltipComponent // 辅助组件
+])
 
 const app = createApp(App)
 
@@ -65,6 +79,8 @@ app.component('ImageUpload', ImageUpload)
 app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
+// 全局注册 ECharts 组件（可直接在所有组件中使用 <v-chart>）
+app.component('v-chart', ECharts)
 
 app.use(router)
 app.use(store)
@@ -82,3 +98,4 @@ app.use(ElementPlus, {
 })
 
 app.mount('#app')
+

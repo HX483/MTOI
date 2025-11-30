@@ -60,15 +60,13 @@ export const constantRoutes = [
   {
     path: '',
     component: Layout,
-    redirect: '/index',
+    redirect: '/report/index', 
     children: [
       {
-        path: '/index',
-        component: () => import('@/views/index'),
-        name: 'Index',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
-      }
-    ]
+        path: '/report/index', 
+        component: () => import('@/views/report/index'), 
+        name: 'ReportIndex', 
+        meta: { title: '报表分析', icon: 'dashboard', affix: true } }]
   },
   {
     path: '/user',
@@ -85,7 +83,7 @@ export const constantRoutes = [
     ]
   },
 
-      // 产品管理模块路由
+  // 产品管理模块路由
   // {
   //   path: '/product',
   //   component: Layout,

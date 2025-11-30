@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.stock.mapper.WarehouseMapper">
+    
+    <resultMap type="Warehouse" id="WarehouseResult">
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="warehouseName"    column="warehouse_name"    />
+        <result property="address"    column="address"    />
+        <result property="managerId"    column="manager_id"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWarehouseVo">
+        select warehouse_id, warehouse_name, address, manager_id, status, create_time, update_time from warehouse
+    </sql>
+
+    <select id="selectWarehouseList" parameterType="Warehouse" resultMap="WarehouseResult">
+        <include refid="selectWarehouseVo"/>
+        <where>  
+            <if test="warehouseName != null  and warehouseName != ''"> and warehouse_name like concat('%', #{warehouseName}, '%')</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="managerId != null "> and manager_id = #{managerId}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWarehouseByWarehouseId" parameterType="Long" resultMap="WarehouseResult">
+        <include refid="selectWarehouseVo"/>
+        where warehouse_id = #{warehouseId}
+    </select>
+
+    <insert id="insertWarehouse" parameterType="Warehouse" useGeneratedKeys="true" keyProperty="warehouseId">
+        insert into warehouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="warehouseName != null and warehouseName != ''">warehouse_name,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="managerId != null">manager_id,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="warehouseName != null and warehouseName != ''">#{warehouseName},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="managerId != null">#{managerId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWarehouse" parameterType="Warehouse">
+        update warehouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="warehouseName != null and warehouseName != ''">warehouse_name = #{warehouseName},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="managerId != null">manager_id = #{managerId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where warehouse_id = #{warehouseId}
+    </update>
+
+    <delete id="deleteWarehouseByWarehouseId" parameterType="Long">
+        delete from warehouse where warehouse_id = #{warehouseId}
+    </delete>
+
+    <delete id="deleteWarehouseByWarehouseIds" parameterType="String">
+        delete from warehouse where warehouse_id in 
+        <foreach item="warehouseId" collection="array" open="(" separator="," close=")">
+            #{warehouseId}
+        </foreach>
+    </delete>
+</mapper>

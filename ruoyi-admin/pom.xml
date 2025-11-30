@@ -71,6 +71,16 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-material</artifactId>
         </dependency>
+        <!--     stock -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-stock</artifactId>
+        </dependency>
+        <!--     report -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-report</artifactId>
+        </dependency>
 
     </dependencies>
 

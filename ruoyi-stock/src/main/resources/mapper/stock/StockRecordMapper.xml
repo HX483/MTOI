@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.stock.mapper.StockRecordMapper">
+    
+    <resultMap type="StockRecord" id="StockRecordResult">
+        <result property="recordId"    column="record_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="type"    column="type"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="beforeQuantity"    column="before_quantity"    />
+        <result property="afterQuantity"    column="after_quantity"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="referenceNo"    column="reference_no"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectStockRecordVo">
+        select record_id, material_id, type, quantity, before_quantity, after_quantity, order_id, reference_no, operator_id, remark, create_time from stock_record
+    </sql>
+
+    <select id="selectStockRecordList" parameterType="StockRecord" resultMap="StockRecordResult">
+        <include refid="selectStockRecordVo"/>
+        <where>  
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="referenceNo != null  and referenceNo != ''"> and reference_no = #{referenceNo}</if>
+            <if test="operatorId != null "> and operator_id = #{operatorId}</if>
+        </where>
+    </select>
+    
+    <select id="selectStockRecordByRecordId" parameterType="Long" resultMap="StockRecordResult">
+        <include refid="selectStockRecordVo"/>
+        where record_id = #{recordId}
+    </select>
+
+    <insert id="insertStockRecord" parameterType="StockRecord" useGeneratedKeys="true" keyProperty="recordId">
+        insert into stock_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">material_id,</if>
+            <if test="type != null">type,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="beforeQuantity != null">before_quantity,</if>
+            <if test="afterQuantity != null">after_quantity,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="referenceNo != null">reference_no,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">#{materialId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="beforeQuantity != null">#{beforeQuantity},</if>
+            <if test="afterQuantity != null">#{afterQuantity},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="referenceNo != null">#{referenceNo},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStockRecord" parameterType="StockRecord">
+        update stock_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="beforeQuantity != null">before_quantity = #{beforeQuantity},</if>
+            <if test="afterQuantity != null">after_quantity = #{afterQuantity},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="referenceNo != null">reference_no = #{referenceNo},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteStockRecordByRecordId" parameterType="Long">
+        delete from stock_record where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteStockRecordByRecordIds" parameterType="String">
+        delete from stock_record where record_id in 
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+</mapper>

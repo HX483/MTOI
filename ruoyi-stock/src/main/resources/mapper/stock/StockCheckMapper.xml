@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.stock.mapper.StockCheckMapper">
+    
+    <resultMap type="StockCheck" id="StockCheckResult">
+        <result property="checkId"    column="check_id"    />
+        <result property="checkNo"    column="check_no"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="checkDate"    column="check_date"    />
+        <result property="checkType"    column="check_type"    />
+        <result property="status"    column="status"    />
+        <result property="totalCount"    column="total_count"    />
+        <result property="discrepancyCount"    column="discrepancy_count"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="StockCheckStockCheckDetailResult" type="StockCheck" extends="StockCheckResult">
+        <collection property="stockCheckDetailList" ofType="StockCheckDetail" column="check_id" select="selectStockCheckDetailList" />
+    </resultMap>
+
+    <resultMap type="StockCheckDetail" id="StockCheckDetailResult">
+        <result property="detailId"    column="detail_id"    />
+        <result property="checkId"    column="check_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="systemQuantity"    column="system_quantity"    />
+        <result property="actualQuantity"    column="actual_quantity"    />
+        <result property="discrepancyQuantity"    column="discrepancy_quantity"    />
+        <result property="unit"    column="unit"    />
+        <result property="status"    column="status"    />
+        <result property="adjustmentTime"    column="adjustment_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectStockCheckVo">
+        select check_id, check_no, warehouse_id, check_date, check_type, status, total_count, discrepancy_count, operator_id, remark, create_time, update_time from stock_check
+    </sql>
+
+    <select id="selectStockCheckList" parameterType="StockCheck" resultMap="StockCheckResult">
+        <include refid="selectStockCheckVo"/>
+        <where>  
+            <if test="checkNo != null  and checkNo != ''"> and check_no = #{checkNo}</if>
+            <if test="warehouseId != null "> and warehouse_id = #{warehouseId}</if>
+            <if test="checkDate != null "> and Date(check_date) = Date(#{checkDate})</if>
+            <if test="checkType != null "> and check_type = #{checkType}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectStockCheckByCheckId" parameterType="Long" resultMap="StockCheckStockCheckDetailResult">
+        select check_id, check_no, warehouse_id, check_date, check_type, status, total_count, discrepancy_count, operator_id, remark, create_time, update_time
+        from stock_check
+        where check_id = #{checkId}
+    </select>
+
+    <select id="selectStockCheckDetailList" resultMap="StockCheckDetailResult">
+        select detail_id, check_id, material_id, system_quantity, actual_quantity, discrepancy_quantity, unit, status, adjustment_time, remark
+        from stock_check_detail
+        where detail_id = #{detail_id}
+    </select>
+
+    <insert id="insertStockCheck" parameterType="StockCheck" useGeneratedKeys="true" keyProperty="checkId">
+        insert into stock_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null and checkNo != ''">check_no,</if>
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="checkDate != null">check_date,</if>
+            <if test="checkType != null">check_type,</if>
+            status,
+            <if test="totalCount != null">total_count,</if>
+            <if test="discrepancyCount != null">discrepancy_count,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="remark != null">remark,</if>
+            create_time,
+            update_time
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null and checkNo != ''">#{checkNo},</if>
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="checkDate != null">#{checkDate},</if>
+            <if test="checkType != null">#{checkType},</if>
+            <if test="status != null">#{status}</if><if test="status == null">1</if>,
+            <if test="totalCount != null">#{totalCount},</if>
+            <if test="discrepancyCount != null">#{discrepancyCount},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime}</if><if test="createTime == null">NOW()</if>,
+            NOW()
+         </trim>
+    </insert>
+    
+    <!-- 查询指定日期的最大盘点单号 -->
+    <select id="selectMaxCheckNoByDate" parameterType="String" resultType="String">
+        SELECT MAX(check_no) 
+        FROM stock_check 
+        WHERE check_no LIKE CONCAT('CK', #{dateStr}, '%')
+    </select>
+
+    <update id="updateStockCheck" parameterType="StockCheck">
+        update stock_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="checkNo != null and checkNo != ''">check_no = #{checkNo},</if>
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="checkDate != null">check_date = #{checkDate},</if>
+            <if test="checkType != null">check_type = #{checkType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="totalCount != null">total_count = #{totalCount},</if>
+            <if test="discrepancyCount != null">discrepancy_count = #{discrepancyCount},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            update_time = NOW()
+        </trim>
+        where check_id = #{checkId}
+    </update>
+
+    <delete id="deleteStockCheckByCheckId" parameterType="Long">
+        delete from stock_check where check_id = #{checkId}
+    </delete>
+
+    <delete id="deleteStockCheckByCheckIds" parameterType="String">
+        delete from stock_check where check_id in 
+        <foreach item="checkId" collection="array" open="(" separator="," close=")">
+            #{checkId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteStockCheckDetailByDetailIds" parameterType="String">
+        delete from stock_check_detail where detail_id in 
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteStockCheckDetailByDetailId" parameterType="Long">
+        delete from stock_check_detail where detail_id = #{detailId}
+    </delete>
+
+    <insert id="batchStockCheckDetail">
+        insert into stock_check_detail( detail_id, check_id, material_id, system_quantity, actual_quantity, discrepancy_quantity, unit, status, adjustment_time, remark) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.detailId}, #{item.checkId}, #{item.materialId}, #{item.systemQuantity}, #{item.actualQuantity}, #{item.discrepancyQuantity}, #{item.unit}, #{item.status}, #{item.adjustmentTime}, #{item.remark})
+        </foreach>
+    </insert>
+</mapper>

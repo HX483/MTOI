@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.stock.mapper.StockInfoMapper">
+    
+    <resultMap type="StockInfo" id="StockInfoResult">
+        <result property="stockId"    column="stock_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="alertThreshold"    column="alert_threshold"    />
+        <result property="warehouseId"    column="warehouse_id"    />
+        <result property="location"    column="location"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectStockInfoVo">
+        select stock_id, material_id, quantity, alert_threshold, warehouse_id, location, create_time, update_time from stock_info
+    </sql>
+
+    <select id="selectStockInfoList" parameterType="StockInfo" resultMap="StockInfoResult">
+        <include refid="selectStockInfoVo"/>
+        <where>  
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="alertThreshold != null "> and alert_threshold = #{alertThreshold}</if>
+            <if test="warehouseId != null "> and warehouse_id = #{warehouseId}</if>
+            <if test="location != null  and location != ''"> and location = #{location}</if>
+            <if test="createTime != null "> and date(create_time) = date(#{createTime})</if>
+        </where>
+    </select>
+    
+    <select id="selectStockInfoByStockId" parameterType="Long" resultMap="StockInfoResult">
+        <include refid="selectStockInfoVo"/>
+        where stock_id = #{stockId}
+    </select>
+
+    <insert id="insertStockInfo" parameterType="StockInfo" useGeneratedKeys="true" keyProperty="stockId">
+        insert into stock_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">material_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="alertThreshold != null">alert_threshold,</if>
+            <if test="warehouseId != null">warehouse_id,</if>
+            <if test="location != null">location,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">#{materialId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="alertThreshold != null">#{alertThreshold},</if>
+            <if test="warehouseId != null">#{warehouseId},</if>
+            <if test="location != null">#{location},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStockInfo" parameterType="StockInfo">
+        update stock_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="alertThreshold != null">alert_threshold = #{alertThreshold},</if>
+            <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where stock_id = #{stockId}
+    </update>
+
+    <delete id="deleteStockInfoByStockId" parameterType="Long">
+        delete from stock_info where stock_id = #{stockId}
+    </delete>
+
+    <delete id="deleteStockInfoByStockIds" parameterType="String">
+        delete from stock_info where stock_id in 
+        <foreach item="stockId" collection="array" open="(" separator="," close=")">
+            #{stockId}
+        </foreach>
+    </delete>
+</mapper>

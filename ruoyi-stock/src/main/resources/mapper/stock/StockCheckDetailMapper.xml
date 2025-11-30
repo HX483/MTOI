@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.stock.mapper.StockCheckDetailMapper">
+    
+    <resultMap type="StockCheckDetail" id="StockCheckDetailResult">
+        <result property="detailId"    column="detail_id"    />
+        <result property="checkId"    column="check_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="systemQuantity"    column="system_quantity"    />
+        <result property="actualQuantity"    column="actual_quantity"    />
+        <result property="discrepancyQuantity"    column="discrepancy_quantity"    />
+        <result property="unit"    column="unit"    />
+        <result property="status"    column="status"    />
+        <result property="adjustmentTime"    column="adjustment_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectStockCheckDetailVo">
+        select detail_id, check_id, material_id, system_quantity, actual_quantity, discrepancy_quantity, unit, status, adjustment_time, remark from stock_check_detail
+    </sql>
+
+    <select id="selectStockCheckDetailList" parameterType="StockCheckDetail" resultMap="StockCheckDetailResult">
+        <include refid="selectStockCheckDetailVo"/>
+        <where>  
+            <if test="checkId != null "> and check_id = #{checkId}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="systemQuantity != null "> and system_quantity = #{systemQuantity}</if>
+            <if test="actualQuantity != null "> and actual_quantity = #{actualQuantity}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="adjustmentTime != null "> and adjustment_time = #{adjustmentTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectStockCheckDetailByDetailId" parameterType="Long" resultMap="StockCheckDetailResult">
+        <include refid="selectStockCheckDetailVo"/>
+        where detail_id = #{detailId}
+    </select>
+
+    <insert id="insertStockCheckDetail" parameterType="StockCheckDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into stock_check_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkId != null">check_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="systemQuantity != null">system_quantity,</if>
+            <if test="actualQuantity != null">actual_quantity,</if>
+            <if test="discrepancyQuantity != null">discrepancy_quantity,</if>
+            <if test="unit != null">unit,</if>
+            <if test="status != null">status,</if>
+            <if test="adjustmentTime != null">adjustment_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkId != null">#{checkId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="systemQuantity != null">#{systemQuantity},</if>
+            <if test="actualQuantity != null">#{actualQuantity},</if>
+            <if test="discrepancyQuantity != null">#{discrepancyQuantity},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="status != null">#{status},</if>
+            <if test="adjustmentTime != null">#{adjustmentTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStockCheckDetail" parameterType="StockCheckDetail">
+        update stock_check_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="checkId != null">check_id = #{checkId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="systemQuantity != null">system_quantity = #{systemQuantity},</if>
+            <if test="actualQuantity != null">actual_quantity = #{actualQuantity},</if>
+            <if test="discrepancyQuantity != null">discrepancy_quantity = #{discrepancyQuantity},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="adjustmentTime != null">adjustment_time = #{adjustmentTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deleteStockCheckDetailByDetailId" parameterType="Long">
+        delete from stock_check_detail where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deleteStockCheckDetailByDetailIds" parameterType="String">
+        delete from stock_check_detail where detail_id in 
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+</mapper>
