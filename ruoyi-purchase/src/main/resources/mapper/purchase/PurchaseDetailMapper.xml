@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.purchase.mapper.PurchaseDetailMapper">
+    
+    <resultMap type="PurchaseDetail" id="PurchaseDetailResult">
+        <result property="detailId"    column="detail_id"    />
+        <result property="purchaseId"    column="purchase_id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="specification"    column="specification"    />
+        <result property="unit"    column="unit"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="amount"    column="amount"    />
+        <result property="actualQuantity"    column="actual_quantity"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPurchaseDetailVo">
+        select detail_id, purchase_id, material_id, material_name, specification, unit, quantity, unit_price, amount, actual_quantity, create_time, update_time from purchase_detail
+    </sql>
+
+    <select id="selectPurchaseDetailList" parameterType="PurchaseDetail" resultMap="PurchaseDetailResult">
+        <include refid="selectPurchaseDetailVo"/>
+        <where>  
+            <if test="purchaseId != null "> and purchase_id = #{purchaseId}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectPurchaseDetailByDetailId" parameterType="Long" resultMap="PurchaseDetailResult">
+        <include refid="selectPurchaseDetailVo"/>
+        where detail_id = #{detailId}
+    </select>
+
+    <insert id="insertPurchaseDetail" parameterType="PurchaseDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into purchase_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="purchaseId != null">purchase_id,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="materialName != null and materialName != ''">material_name,</if>
+            <if test="specification != null">specification,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="amount != null">amount,</if>
+            <if test="actualQuantity != null">actual_quantity,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="purchaseId != null">#{purchaseId},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialName != null and materialName != ''">#{materialName},</if>
+            <if test="specification != null">#{specification},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="actualQuantity != null">#{actualQuantity},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePurchaseDetail" parameterType="PurchaseDetail">
+        update purchase_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="purchaseId != null">purchase_id = #{purchaseId},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="specification != null">specification = #{specification},</if>
+            <if test="unit != null and unit != ''">unit = #{unit},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="actualQuantity != null">actual_quantity = #{actualQuantity},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deletePurchaseDetailByDetailId" parameterType="Long">
+        delete from purchase_detail where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deletePurchaseDetailByDetailIds" parameterType="String">
+        delete from purchase_detail where detail_id in 
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+</mapper>

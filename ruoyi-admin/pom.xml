@@ -81,6 +81,16 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-report</artifactId>
         </dependency>
+        <!--     order -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-order</artifactId>
+        </dependency>
+        <!--     purchase -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-purchase</artifactId>
+        </dependency>
 
     </dependencies>
 

@@ -243,6 +243,18 @@
                 <artifactId>ruoyi-report</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+            <!-- order     -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-order</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <!-- purchase     -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-purchase</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -258,6 +270,8 @@
         <module>ruoyi-material</module>
         <module>ruoyi-stock</module>
         <module>ruoyi-report</module>
+        <module>ruoyi-order</module>
+        <module>ruoyi-purchase</module>
     </modules>
     <packaging>pom</packaging>
 
