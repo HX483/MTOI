@@ -125,6 +125,8 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService
             for (PurchaseDetail purchaseDetail : purchaseDetailList)
             {
                 purchaseDetail.setPurchaseId(purchaseId);
+                // 设置创建时间
+                purchaseDetail.setCreateTime(DateUtils.getNowDate());
                 list.add(purchaseDetail);
             }
             if (list.size() > 0)

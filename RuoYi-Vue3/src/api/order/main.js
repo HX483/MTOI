@@ -42,3 +42,11 @@ export function delMain(orderId) {
     method: 'delete'
   })
 }
+
+// 生成订单编号
+export function generateOrderNo() {
+  return request({
+    url: '/order/main/generateOrderNo',
+    method: 'get'
+  })
+}

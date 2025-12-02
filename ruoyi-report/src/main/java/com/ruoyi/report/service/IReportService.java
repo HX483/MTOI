@@ -47,6 +47,20 @@ public interface IReportService
     public Map<String, Object> getProductAnalysis();
 
     /**
+     * 获取订单统计报表
+     * 
+     * @return 订单统计数据
+     */
+    public Map<String, Object> getOrderStatistics();
+
+    /**
+     * 获取采购统计报表
+     * 
+     * @return 采购统计数据
+     */
+    public Map<String, Object> getPurchaseStatistics();
+
+    /**
      * 获取综合仪表盘数据
      * 
      * @return 仪表盘数据

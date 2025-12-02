@@ -59,8 +59,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentType != null "> and payment_type = #{paymentType}</if>
             <if test="tableNo != null  and tableNo != ''"> and table_no = #{tableNo}</if>
             <if test="deliveryAddress != null  and deliveryAddress != ''"> and delivery_address = #{deliveryAddress}</if>
-            <if test="paymentTime != null "> and payment_time = #{paymentTime}</if>
-            <if test="completionTime != null "> and completion_time = #{completionTime}</if>
+            <if test="paymentTime != null "> and date(payment_time)= date(#{paymentTime})</if>
+            <if test="completionTime != null "> and date(completion_time) = date(#{completionTime})</if>
         </where>
     </select>
     
@@ -79,46 +79,42 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertOrderMain" parameterType="OrderMain" useGeneratedKeys="true" keyProperty="orderId">
         insert into order_main
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            order_no,
             <if test="customerId != null">customer_id,</if>
-            <if test="customerName != null and customerName != ''">customer_name,</if>
-            <if test="customerPhone != null and customerPhone != ''">customer_phone,</if>
-            <if test="totalAmount != null">total_amount,</if>
-            <if test="actualAmount != null">actual_amount,</if>
+            customer_name,
+            customer_phone,
+            total_amount,
+            actual_amount,
             <if test="discountAmount != null">discount_amount,</if>
-            <if test="orderType != null">order_type,</if>
-            <if test="status != null">status,</if>
-            <if test="paymentStatus != null">payment_status,</if>
+            order_type,
+            status,
+            payment_status,
             <if test="paymentType != null">payment_type,</if>
             <if test="tableNo != null">table_no,</if>
             <if test="deliveryAddress != null">delivery_address,</if>
             <if test="remark != null">remark,</if>
             <if test="operatorId != null">operator_id,</if>
-            <if test="createTime != null">create_time,</if>
+            create_time,
             <if test="updateTime != null">update_time,</if>
-            <if test="paymentTime != null">payment_time,</if>
-            <if test="completionTime != null">completion_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            #{orderNo},
             <if test="customerId != null">#{customerId},</if>
-            <if test="customerName != null and customerName != ''">#{customerName},</if>
-            <if test="customerPhone != null and customerPhone != ''">#{customerPhone},</if>
-            <if test="totalAmount != null">#{totalAmount},</if>
-            <if test="actualAmount != null">#{actualAmount},</if>
+            #{customerName},
+            #{customerPhone},
+            #{totalAmount},
+            #{actualAmount},
             <if test="discountAmount != null">#{discountAmount},</if>
-            <if test="orderType != null">#{orderType},</if>
-            <if test="status != null">#{status},</if>
-            <if test="paymentStatus != null">#{paymentStatus},</if>
+            #{orderType},
+            #{status},
+            #{paymentStatus},
             <if test="paymentType != null">#{paymentType},</if>
             <if test="tableNo != null">#{tableNo},</if>
             <if test="deliveryAddress != null">#{deliveryAddress},</if>
             <if test="remark != null">#{remark},</if>
             <if test="operatorId != null">#{operatorId},</if>
-            <if test="createTime != null">#{createTime},</if>
+            #{createTime},
             <if test="updateTime != null">#{updateTime},</if>
-            <if test="paymentTime != null">#{paymentTime},</if>
-            <if test="completionTime != null">#{completionTime},</if>
          </trim>
     </insert>
 
@@ -141,7 +137,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             <if test="operatorId != null">operator_id = #{operatorId},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateTime !=null"> update_time = #{updateTime},</if>
             <if test="paymentTime != null">payment_time = #{paymentTime},</if>
             <if test="completionTime != null">completion_time = #{completionTime},</if>
         </trim>

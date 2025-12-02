@@ -22,7 +22,7 @@
       <el-form-item label="是否热销" prop="isHot">
         <el-select v-model="queryParams.isHot" placeholder="请选择是否热销" clearable style="width: 150px;">
           <el-option
-            v-for="dict in sys_yes_no"
+            v-for="dict in yes_no"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -32,7 +32,7 @@
       <el-form-item label="是否新品" prop="isNew">
         <el-select v-model="queryParams.isNew" placeholder="请选择是否新品" clearable style="width: 150px;">
           <el-option
-            v-for="dict in sys_yes_no"
+            v-for="dict in yes_no"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -115,12 +115,12 @@
       </el-table-column>
       <el-table-column label="是否热销" align="center" prop="isHot">
         <template #default="scope">
-          <dict-tag :options="sys_yes_no" :value="scope.row.isHot"/>
+          <dict-tag :options="yes_no" :value="scope.row.isHot"/>
         </template>
       </el-table-column>
       <el-table-column label="是否新品" align="center" prop="isNew">
         <template #default="scope">
-          <dict-tag :options="sys_yes_no" :value="scope.row.isNew"/>
+          <dict-tag :options="yes_no" :value="scope.row.isNew"/>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
@@ -182,7 +182,7 @@
         <el-form-item label="是否热销" prop="isHot">
           <el-select v-model="form.isHot" placeholder="请选择是否热销">
             <el-option
-              v-for="dict in sys_yes_no"
+              v-for="dict in yes_no"
               :key="dict.value"
               :label="dict.label"
               :value="parseInt(dict.value)"
@@ -192,7 +192,7 @@
         <el-form-item label="是否新品" prop="isNew">
           <el-select v-model="form.isNew" placeholder="请选择是否新品">
             <el-option
-              v-for="dict in sys_yes_no"
+              v-for="dict in yes_no"
               :key="dict.value"
               :label="dict.label"
               :value="parseInt(dict.value)"
@@ -268,7 +268,7 @@ import { listInfo as listMaterialInfo } from "@/api/material/info"
 import {listCategory} from "../../../api/product/category.js";
 
 const { proxy } = getCurrentInstance()
-const { sys_yes_no, putaway_yes_no } = proxy.useDict('sys_yes_no', 'putaway_yes_no')
+const { yes_no, putaway_yes_no } = proxy.useDict('yes_no', 'putaway_yes_no')
 
 const infoList = ref([])
 const productFormulaList = ref([])

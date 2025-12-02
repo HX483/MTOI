@@ -66,7 +66,7 @@ export const constantRoutes = [
         path: '/report/index', 
         component: () => import('@/views/report/index'), 
         name: 'ReportIndex', 
-        meta: { title: '报表分析', icon: 'dashboard', affix: true } }]
+        meta: { title: '信息总览', icon: 'dashboard', affix: true } }]
   },
   {
     path: '/user',

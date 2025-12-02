@@ -96,6 +96,56 @@ public interface ReportMapper
      * 按分类统计产品
      */
     public List<Map<String, Object>> getProductByCategory();
+    
+    /**
+     * 获取订单总数
+     */
+    public Long getTotalOrders();
+    
+    /**
+     * 获取待处理订单数
+     */
+    public Long getPendingOrders();
+    
+    /**
+     * 获取已完成订单数
+     */
+    public Long getCompletedOrders();
+    
+    /**
+     * 获取本月订单金额
+     */
+    public Double getMonthOrderAmount();
+    
+    /**
+     * 按客户统计订单
+     */
+    public List<Map<String, Object>> getOrderByCustomer();
+    
+    /**
+     * 获取采购订单总数
+     */
+    public Long getTotalPurchases();
+    
+    /**
+     * 获取待处理采购订单数
+     */
+    public Long getPendingPurchases();
+    
+    /**
+     * 获取已完成采购订单数
+     */
+    public Long getCompletedPurchases();
+    
+    /**
+     * 获取本月采购金额
+     */
+    public Double getMonthPurchaseAmount();
+    
+    /**
+     * 按供应商统计采购
+     */
+    public List<Map<String, Object>> getPurchaseBySupplier();
 }
 
 

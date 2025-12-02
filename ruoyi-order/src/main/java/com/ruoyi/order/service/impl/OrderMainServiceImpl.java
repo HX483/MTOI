@@ -1,5 +1,7 @@
 package com.ruoyi.order.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,20 @@ public class OrderMainServiceImpl implements IOrderMainService
     @Override
     public int insertOrderMain(OrderMain orderMain)
     {
+        // orderId使用数据库自增，不需要手动设置
+        orderMain.setOrderId(null);
+        
+        // 确保订单编号不为空（前端已生成）
+        if (StringUtils.isEmpty(orderMain.getOrderNo())) {
+            // 如果前端未生成订单编号，则后端补充生成
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String datePart = sdf.format(new Date());
+            // 简单的随机3位数，实际项目中应该使用数据库序列或其他方式保证唯一性
+            String sequence = String.format("%03d", (int)(Math.random() * 1000));
+            String orderNo = "ORD-" + datePart + sequence;
+            orderMain.setOrderNo(orderNo);
+        }
+        
         orderMain.setCreateTime(DateUtils.getNowDate());
         int rows = orderMainMapper.insertOrderMain(orderMain);
         insertOrderDetail(orderMain);
@@ -123,6 +139,10 @@ public class OrderMainServiceImpl implements IOrderMainService
             for (OrderDetail orderDetail : orderDetailList)
             {
                 orderDetail.setOrderId(orderId);
+                // 设置创建时间
+                if (orderDetail.getCreateTime() == null) {
+                    orderDetail.setCreateTime(DateUtils.getNowDate());
+                }
                 list.add(orderDetail);
             }
             if (list.size() > 0)

@@ -131,6 +131,68 @@ public class ReportServiceImpl implements IReportService
         
         return result;
     }
+    
+    /**
+     * 获取订单统计报表
+     */
+    @Override
+    public Map<String, Object> getOrderStatistics()
+    {
+        Map<String, Object> result = new HashMap<>();
+        
+        // 订单总数
+        Long totalOrders = reportMapper.getTotalOrders();
+        result.put("totalOrders", totalOrders != null ? totalOrders : 0);
+        
+        // 待处理订单数
+        Long pendingOrders = reportMapper.getPendingOrders();
+        result.put("pendingOrders", pendingOrders != null ? pendingOrders : 0);
+        
+        // 已完成订单数
+        Long completedOrders = reportMapper.getCompletedOrders();
+        result.put("completedOrders", completedOrders != null ? completedOrders : 0);
+        
+        // 本月订单金额
+        Double monthOrderAmount = reportMapper.getMonthOrderAmount();
+        result.put("monthOrderAmount", monthOrderAmount != null ? monthOrderAmount : 0.0);
+        
+        // 按客户统计
+        List<Map<String, Object>> customerStats = reportMapper.getOrderByCustomer();
+        result.put("customerStats", customerStats);
+        
+        return result;
+    }
+    
+    /**
+     * 获取采购统计报表
+     */
+    @Override
+    public Map<String, Object> getPurchaseStatistics()
+    {
+        Map<String, Object> result = new HashMap<>();
+        
+        // 采购订单总数
+        Long totalPurchases = reportMapper.getTotalPurchases();
+        result.put("totalPurchases", totalPurchases != null ? totalPurchases : 0);
+        
+        // 待处理采购订单数
+        Long pendingPurchases = reportMapper.getPendingPurchases();
+        result.put("pendingPurchases", pendingPurchases != null ? pendingPurchases : 0);
+        
+        // 已完成采购订单数
+        Long completedPurchases = reportMapper.getCompletedPurchases();
+        result.put("completedPurchases", completedPurchases != null ? completedPurchases : 0);
+        
+        // 本月采购金额
+        Double monthPurchaseAmount = reportMapper.getMonthPurchaseAmount();
+        result.put("monthPurchaseAmount", monthPurchaseAmount != null ? monthPurchaseAmount : 0.0);
+        
+        // 按供应商统计
+        List<Map<String, Object>> supplierStats = reportMapper.getPurchaseBySupplier();
+        result.put("supplierStats", supplierStats);
+        
+        return result;
+    }
 
     /**
      * 获取综合仪表盘数据
@@ -148,6 +210,12 @@ public class ReportServiceImpl implements IReportService
         
         // 产品分析
         dashboard.put("productAnalysis", getProductAnalysis());
+        
+        // 订单统计
+        dashboard.put("orderStatistics", getOrderStatistics());
+        
+        // 采购统计
+        dashboard.put("purchaseStatistics", getPurchaseStatistics());
         
         // 预警信息
         dashboard.put("alerts", getStockAlert());

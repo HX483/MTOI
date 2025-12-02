@@ -30,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="materialId != null "> and material_id = #{materialId}</if>
             <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
             <if test="quantity != null "> and quantity = #{quantity}</if>
-            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="createTime != null "> and  date(create_time) = date(#{createTime})</if>
         </where>
     </select>
     
@@ -64,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="unitPrice != null">#{unitPrice},</if>
             <if test="amount != null">#{amount},</if>
             <if test="actualQuantity != null">#{actualQuantity},</if>
-            <if test="createTime != null">#{createTime},</if>
+            <if test="createTime != null ">#{createTime}</if>
             <if test="updateTime != null">#{updateTime},</if>
          </trim>
     </insert>

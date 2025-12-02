@@ -40,6 +40,22 @@ export function getProductAnalysis() {
   })
 }
 
+// 获取订单统计报表
+export function getOrderStatistics() {
+  return request({
+    url: '/report/order/statistics',
+    method: 'get'
+  })
+}
+
+// 获取采购统计报表
+export function getPurchaseStatistics() {
+  return request({
+    url: '/report/purchase/statistics',
+    method: 'get'
+  })
+}
+
 // 获取综合仪表盘数据
 export function getDashboard() {
   return request({

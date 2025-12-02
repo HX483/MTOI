@@ -45,7 +45,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="price != null">price,</if>
             <if test="subtotal != null">subtotal,</if>
             <if test="customization != null">customization,</if>
-            <if test="createTime != null">create_time,</if>
+            create_time,
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderId != null">#{orderId},</if>
@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="price != null">#{price},</if>
             <if test="subtotal != null">#{subtotal},</if>
             <if test="customization != null">#{customization},</if>
-            <if test="createTime != null">#{createTime},</if>
+            <if test="createTime != null">#{createTime}</if><if test="createTime == null">NOW()</if>,
          </trim>
     </insert>
 

@@ -11,17 +11,43 @@
             </div>
           </template>
           <div v-loading="dashboardLoading">
-            <el-row :gutter="20" v-if="stockStatistics">
-              <!-- 库存统计卡片 -->
-              <el-col :span="6" v-for="(item, index) in stockCards" :key="index">
-                <el-card class="stat-card" shadow="never">
-                  <div class="stat-content">
-                    <div class="stat-value">{{ item.value }}</div>
-                    <div class="stat-label">{{ item.label }}</div>
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+            <div v-if="stockStatistics || orderStatistics || purchaseStatistics">
+              <el-row :gutter="20">
+                <!-- 库存统计卡片 -->
+                <el-col :span="6" v-for="(item, index) in stockCards" :key="index">
+                  <el-card class="stat-card" shadow="never">
+                    <div class="stat-content">
+                      <div class="stat-value">{{ item.value }}</div>
+                      <div class="stat-label">{{ item.label }}</div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+              
+              <!-- 订单统计卡片 -->
+              <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="6" v-for="(item, index) in orderCards" :key="index">
+                  <el-card class="stat-card order-card" shadow="never">
+                    <div class="stat-content">
+                      <div class="stat-value">{{ item.value }}</div>
+                      <div class="stat-label">{{ item.label }}</div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+              
+              <!-- 采购统计卡片 -->
+              <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="6" v-for="(item, index) in purchaseCards" :key="index">
+                  <el-card class="stat-card purchase-card" shadow="never">
+                    <div class="stat-content">
+                      <div class="stat-value">{{ item.value }}</div>
+                      <div class="stat-label">{{ item.label }}</div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </div>
             <el-empty v-else description="暂无数据" />
           </div>
         </el-card>
@@ -166,7 +192,7 @@
 </template>
 
 <script setup name="Report">
-import { getStockStatistics, getStockAlert, getCheckAnalysis, getMaterialUsage, getProductAnalysis, getDashboard } from "@/api/report"
+import { getStockStatistics, getStockAlert, getCheckAnalysis, getMaterialUsage, getProductAnalysis, getDashboard, getOrderStatistics, getPurchaseStatistics } from "@/api/report"
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers' // 确保从正确路径导入
 import { BarChart, PieChart } from 'echarts/charts'
@@ -197,6 +223,8 @@ const checkAnalysis = ref(null)
 const alertList = ref([])
 const productAnalysis = ref(null)
 const materialUsageList = ref([])
+const orderStatistics = ref(null)
+const purchaseStatistics = ref(null)
 
 // 仓库库存统计图表配置
 const warehouseChartOption = computed(() => {
@@ -423,19 +451,41 @@ const stockCards = computed(() => {
   ]
 })
 
+// 订单统计卡片
+const orderCards = computed(() => {
+  if (!orderStatistics.value) return []
+  return [
+    { label: '客户订单总数', value: orderStatistics.value.totalOrders || 0 },
+    { label: '待处理订单', value: orderStatistics.value.pendingOrders || 0 },
+    { label: '已完成订单', value: orderStatistics.value.completedOrders || 0 },
+    { label: '本月订单金额', value: '¥' + formatNumber(orderStatistics.value.monthOrderAmount || 0) }
+  ]
+})
+
+// 采购统计卡片
+const purchaseCards = computed(() => {
+  if (!purchaseStatistics.value) return []
+  return [
+    { label: '采购订单总数', value: purchaseStatistics.value.totalPurchases || 0 },
+    { label: '待处理采购', value: purchaseStatistics.value.pendingPurchases || 0 },
+    { label: '已完成采购', value: purchaseStatistics.value.completedPurchases || 0 },
+    { label: '本月采购金额', value: '¥' + formatNumber(purchaseStatistics.value.monthPurchaseAmount || 0) }
+  ]
+})
+
 /** 格式化数字 */
 function formatNumber(num) {
   if (!num) return '0.00'
   return Number(num).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-/** 刷新仪表盘 */
-function refreshDashboard() {
-  loadDashboard()
+/** 格式化金额 */
+function formatCurrency(value) {
+  return '¥' + (value || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-/** 加载仪表盘数据 */
-function loadDashboard() {
+/** 刷新仪表盘 */
+function refreshDashboard() {
   dashboardLoading.value = true
   getDashboard().then(response => {
     dashboardData.value = response.data
@@ -450,6 +500,12 @@ function loadDashboard() {
     }
     if (response.data.alerts) {
       alertList.value = response.data.alerts
+    }
+    if (response.data.orderStatistics) {
+      orderStatistics.value = response.data.orderStatistics
+    }
+    if (response.data.purchaseStatistics) {
+      purchaseStatistics.value = response.data.purchaseStatistics
     }
     dashboardLoading.value = false
   }).catch(() => {
@@ -514,7 +570,7 @@ function loadMaterialUsage() {
 
 // 页面加载时获取数据
 onMounted(() => {
-  loadDashboard()
+  refreshDashboard()
   loadStockStatistics()
   loadCheckAnalysis()
   loadStockAlert()
@@ -532,6 +588,24 @@ onMounted(() => {
 
 .stat-card {
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 订单统计卡片样式 */
+.stat-card.order-card {
+  background-color: #ecf5ff;
+  border-left: 4px solid #409eff;
+}
+
+/* 采购统计卡片样式 */
+.stat-card.purchase-card {
+  background-color: #f0f9eb;
+  border-left: 4px solid #67c23a;
 }
 
 .stat-content {

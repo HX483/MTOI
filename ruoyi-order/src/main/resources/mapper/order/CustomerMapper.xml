@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="memberLevel != null "> and member_level = #{memberLevel}</if>
             <if test="points != null "> and points = #{points}</if>
             <if test="totalConsume != null "> and total_consume = #{totalConsume}</if>
-            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="createTime != null "> and  date(create_time) = date(#{createTime})</if>
         </where>
     </select>
     

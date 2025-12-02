@@ -1,5 +1,7 @@
 package com.ruoyi.purchase.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -96,5 +98,21 @@ public class PurchaseOrderController extends BaseController
     public AjaxResult remove(@PathVariable Long[] purchaseIds)
     {
         return toAjax(purchaseOrderService.deletePurchaseOrderByPurchaseIds(purchaseIds));
+    }
+    
+    /**
+     * 生成采购订单编号
+     */
+    @PreAuthorize("@ss.hasPermi('purchase:order:add')")
+    @GetMapping("/generatePurchaseNo")
+    public AjaxResult generatePurchaseNo()
+    {
+        // 生成采购订单编号的逻辑
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String datePart = sdf.format(new Date());
+        // 简单的随机3位数，实际项目中应该使用数据库序列或其他方式保证唯一性
+        String sequence = String.format("%03d", (int)(Math.random() * 1000));
+        String purchaseNo = "PO-" + datePart + sequence;
+        return success(purchaseNo);
     }
 }

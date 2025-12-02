@@ -42,3 +42,11 @@ export function delOrder(purchaseId) {
     method: 'delete'
   })
 }
+
+// 生成采购订单编号
+export function generatePurchaseNo() {
+  return request({
+    url: '/purchase/order/generatePurchaseNo',
+    method: 'get'
+  })
+}

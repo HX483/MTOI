@@ -80,6 +80,28 @@ public class ReportController extends BaseController
     }
 
     /**
+     * 获取订单统计报表
+     */
+    @PreAuthorize("@ss.hasPermi('report:order:list')")
+    @GetMapping("/order/statistics")
+    public AjaxResult getOrderStatistics()
+    {
+        Map<String, Object> statistics = reportService.getOrderStatistics();
+        return success(statistics);
+    }
+
+    /**
+     * 获取采购统计报表
+     */
+    @PreAuthorize("@ss.hasPermi('report:purchase:list')")
+    @GetMapping("/purchase/statistics")
+    public AjaxResult getPurchaseStatistics()
+    {
+        Map<String, Object> statistics = reportService.getPurchaseStatistics();
+        return success(statistics);
+    }
+
+    /**
      * 获取综合仪表盘数据
      */
     @PreAuthorize("@ss.hasPermi('report:dashboard:list')")

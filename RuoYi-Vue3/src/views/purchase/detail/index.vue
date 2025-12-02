@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="90px">
       <el-form-item label="采购订单ID" prop="purchaseId">
         <el-input
           v-model="queryParams.purchaseId"
@@ -160,8 +160,11 @@
 
 <script setup name="Detail">
 import { listDetail, getDetail, delDetail, addDetail, updateDetail } from "@/api/purchase/detail"
+import { useRoute } from 'vue-router'
+import { watch } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const route = useRoute()
 
 const detailList = ref([])
 const open = ref(false)
@@ -220,6 +223,27 @@ function getList() {
     loading.value = false
   })
 }
+
+// 从路由参数中获取采购订单ID并自动查询
+function initData() {
+  const purchaseId = route.query.purchaseId
+  if (purchaseId) {
+    queryParams.value.purchaseId = purchaseId
+    getList()
+  } else {
+    getList()
+  }
+}
+
+// 监听路由参数变化，确保每次点击不同订单详情时都重新查询
+watch(() => route.query.purchaseId, (newPurchaseId) => {
+  if (newPurchaseId) {
+    queryParams.value.purchaseId = newPurchaseId
+    getList()
+  }
+}, { immediate: false, deep: true })
+
+initData()
 
 // 取消按钮
 function cancel() {

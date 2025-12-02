@@ -1,5 +1,7 @@
 package com.ruoyi.order.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -100,5 +102,20 @@ public class OrderMainController extends BaseController
     public AjaxResult remove(@PathVariable Long[] orderIds)
     {
         return toAjax(orderMainService.deleteOrderMainByOrderIds(orderIds));
+    }
+
+    /**
+     * 生成订单编号
+     */
+    @PreAuthorize("@ss.hasPermi('order:main:add')")
+    @GetMapping("/generateOrderNo")
+    public AjaxResult generateOrderNo()
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String datePart = sdf.format(new Date());
+        // 简单的随机3位数，实际项目中应该使用数据库序列或其他方式保证唯一性
+        String sequence = String.format("%03d", (int)(Math.random() * 1000));
+        String orderNo = "ORD-" + datePart + sequence;
+        return AjaxResult.success(orderNo);
     }
 }

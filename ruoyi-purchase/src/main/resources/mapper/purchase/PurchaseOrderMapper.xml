@@ -49,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
             <if test="totalAmount != null "> and total_amount = #{totalAmount}</if>
             <if test="status != null "> and status = #{status}</if>
-            <if test="auditTime != null "> and audit_time = #{auditTime}</if>
+            <if test="auditTime != null "> and date(audit_time) = date(#{auditTime})</if>
             <if test="completionTime != null "> and completion_time = #{completionTime}</if>
         </where>
     </select>

@@ -149,5 +149,79 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY product_count DESC
     </select>
 
+    <!-- 获取订单总数 -->
+    <select id="getTotalOrders" resultType="Long">
+        SELECT COUNT(*) FROM order_main
+    </select>
+
+    <!-- 获取待处理订单数 -->
+    <select id="getPendingOrders" resultType="Long">
+        SELECT COUNT(*) FROM order_main WHERE status != 8
+    </select>
+
+    <!-- 获取已完成订单数 -->
+    <select id="getCompletedOrders" resultType="Long">
+        SELECT COUNT(*) FROM order_main WHERE status = 8
+    </select>
+
+    <!-- 获取本月订单金额 -->
+    <select id="getMonthOrderAmount" resultType="Double">
+        SELECT COALESCE(SUM(actual_amount), 0) 
+        FROM order_main 
+        WHERE DATE_FORMAT(completion_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    </select>
+
+    <!-- 按客户统计订单 -->
+    <select id="getOrderByCustomer" resultType="java.util.HashMap">
+        SELECT 
+            om.customer_id,
+            c.customer_name,
+            COUNT(om.order_id) as order_count,
+            COALESCE(SUM(om.total_amount), 0) as total_amount,
+            COALESCE(SUM(CASE WHEN om.status = 4 THEN 1 ELSE 0 END), 0) as completed_count
+        FROM order_main om
+        LEFT JOIN customer c ON om.customer_id = c.customer_id
+        GROUP BY om.customer_id, c.customer_name
+        ORDER BY order_count DESC
+        LIMIT 10
+    </select>
+
+    <!-- 获取采购订单总数 -->
+    <select id="getTotalPurchases" resultType="Long">
+        SELECT COUNT(*) FROM purchase_order
+    </select>
+
+    <!-- 获取待处理采购订单数 -->
+    <select id="getPendingPurchases" resultType="Long">
+        SELECT COUNT(*) FROM purchase_order WHERE status &lt; 4
+    </select>
+
+    <!-- 获取已完成采购订单数 -->
+    <select id="getCompletedPurchases" resultType="Long">
+        SELECT COUNT(*) FROM purchase_order WHERE status &gt; 3
+    </select>
+
+    <!-- 获取本月采购金额 -->
+    <select id="getMonthPurchaseAmount" resultType="Double">
+        SELECT COALESCE(SUM(total_amount), 0) 
+        FROM purchase_order 
+        WHERE DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+    </select>
+
+    <!-- 按供应商统计采购 -->
+    <select id="getPurchaseBySupplier" resultType="java.util.HashMap">
+        SELECT 
+            po.supplier_id,
+            s.supplier_name,
+            COUNT(po.purchase_id) as purchase_count,
+            COALESCE(SUM(po.total_amount), 0) as total_amount,
+            COALESCE(SUM(CASE WHEN po.status = 4 THEN 1 ELSE 0 END), 0) as completed_count
+        FROM purchase_order po
+        LEFT JOIN supplier s ON po.supplier_id = s.supplier_id
+        GROUP BY po.supplier_id, s.supplier_name
+        ORDER BY purchase_count DESC
+        LIMIT 10
+    </select>
+
 </mapper>
 
