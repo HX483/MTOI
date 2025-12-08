@@ -4,9 +4,9 @@
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">奶茶店订单制作与原料库存管理系统</h1>
 <h4 align="center">基于MTOI框架结合大模型技术的奶茶店智能管理平台</h4>
 <p align="center">
-	<a href="https://gitee.com/y_project/RuoYi-Vue/stargazers"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue"><img src="https://img.shields.io/badge/MTOI-v1.0.0-brightgreen.svg"></a>
-	<a href="https://gitee.com/y_project/RuoYi-Vue/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
+	<a href="https://gitee.com/chmxi_hao/MTOI/stargazers"><img src="https://gitee.com/y_project/RuoYi-Vue/badge/star.svg?theme=dark"></a>
+	<a href="https://gitee.com/chmxi_hao/MTOI"><img src="https://img.shields.io/badge/MTOI-v1.0.0-brightgreen.svg"></a>
+	<a href="https://gitee.com/chmxi_hao/MTOI/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
 </p>
 
 ## 平台简介
