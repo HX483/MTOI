@@ -110,13 +110,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             mi.material_id,
             mi.material_name,
             mi.specification,
+            w.warehouse_id,
+            w.warehouse_name,
             COALESCE(SUM(si.quantity), 0) as total_quantity,
             COUNT(DISTINCT si.warehouse_id) as warehouse_count,
             COALESCE(SUM(pf.quantity), 0) as used_in_products
         FROM material_info mi
         LEFT JOIN stock_info si ON mi.material_id = si.material_id
+        LEFT JOIN warehouse w ON si.warehouse_id = w.warehouse_id
         LEFT JOIN product_formula pf ON mi.material_id = pf.material_id
-        GROUP BY mi.material_id, mi.material_name, mi.specification
+        GROUP BY mi.material_id, mi.material_name, mi.specification, w.warehouse_id, w.warehouse_name
         ORDER BY total_quantity DESC
     </select>
 

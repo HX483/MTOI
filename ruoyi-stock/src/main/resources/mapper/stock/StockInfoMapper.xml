@@ -45,7 +45,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="warehouseId != null">warehouse_id,</if>
             <if test="location != null">location,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
+            update_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="materialId != null">#{materialId},</if>
@@ -54,7 +54,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="warehouseId != null">#{warehouseId},</if>
             <if test="location != null">#{location},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
+            null
          </trim>
     </insert>
 
@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="warehouseId != null">warehouse_id = #{warehouseId},</if>
             <if test="location != null">location = #{location},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            update_time = NOW()
         </trim>
         where stock_id = #{stockId}
     </update>

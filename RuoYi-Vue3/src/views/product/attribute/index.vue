@@ -226,6 +226,7 @@ function getProductList() {
 }
 
 /** 格式化属性值显示，返回数组 */
+
 function formatAttributeValue(value) {
   if (!value) return [];
   try {
@@ -233,17 +234,21 @@ function formatAttributeValue(value) {
     const parsed = typeof value === 'string' ? JSON.parse(value) : value;
     // 如果是包含options数组的对象
     if (parsed && parsed.options && Array.isArray(parsed.options)) {
+      console.log("parsed.options:", parsed.options);
       return parsed.options;
     }
     // 如果本身就是数组
     if (Array.isArray(parsed)) {
+      console.log("parsed:", parsed);
       return parsed;
     }
     // 如果是用顿号连接的字符串，分割成数组
     if (typeof parsed === 'string' && parsed.includes('、')) {
+      console.log("parsed.split('、'):", parsed.split('、'));
       return parsed.split('、');
     }
     // 返回单元素数组
+    console.log("[String(parsed)]:", [String(parsed)]);
     return [String(parsed)];
   } catch (error) {
     // 如果解析失败，返回原始值作为单元素数组

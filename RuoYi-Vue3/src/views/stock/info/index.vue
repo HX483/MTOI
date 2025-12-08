@@ -229,7 +229,7 @@ function getList() {
 
 /** 查询原料信息 */
 function getMaterialInfo() {
-  materialInfo().then(response => {
+  materialInfo({ pageNum: 1, pageSize: 9999 }).then(response => {
     materialList.value = response.rows
     materialList.value.forEach((item) => {
       materialMap.value.set(item.materialId, item.materialName)

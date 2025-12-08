@@ -13,7 +13,7 @@ import com.ruoyi.report.service.IReportService;
 
 /**
  * 报表分析Controller
- * 
+ *
  * @author xihao
  * @date 2025-01-01
  */
