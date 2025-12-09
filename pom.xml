@@ -30,6 +30,11 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
+        <!-- Test dependencies -->
+        <junit-jupiter.version>5.7.2</junit-jupiter.version>
+        <mockito.version>3.12.4</mockito.version>
+        <byte-buddy.version>1.10.22</byte-buddy.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <!-- override dependency version -->
         <tomcat.version>9.0.108</tomcat.version>
         <logback.version>1.2.13</logback.version>
@@ -40,6 +45,45 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <!-- JUnit 5 -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Mockito -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Byte Buddy -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
+                <scope>test</scope>
+            </dependency>
 
             <!-- 覆盖SpringFramework的依赖配置-->
             <dependency>
@@ -285,6 +329,16 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <!-- Maven Surefire 插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <testFailureIgnore>false</testFailureIgnore>
                 </configuration>
             </plugin>
         </plugins>
