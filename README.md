@@ -25,7 +25,7 @@ MTOI奶茶店订单制作与原料库存管理系统是一套全部开源的智�
 ### 后端技术栈
 - **核心框架**：Spring Boot 2.5.x + MyBatis
 - **安全框架**：Spring Security + JWT
-- **数据库**：MySQL 8.0
+- **数据库**：MySQL 5.7
 - **缓存**：Redis
 - **接口文档**：Swagger 3.0
 - **日志管理**：Logback
@@ -112,7 +112,7 @@ MTOI/
 ### 后端环境
 1. **JDK版本**：Java 8 或以上
 2. **开发工具**：IntelliJ IDEA
-3. **数据库**：MySQL 8.0
+3. **数据库**：MySQL 5.7
 4. **缓存**：Redis 5.0 或以上
 5. **构建工具**：Maven 3.6 或以上
 

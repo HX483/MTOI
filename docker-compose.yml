@@ -1,0 +1,58 @@
+version: '3.8'  # Compose 文件版本（需与 Docker 版本兼容）
+
+services:
+  # 前端容器
+  frontend:
+    build: ./RuoYi-Vue3  # 构建上下文：前端项目目录（含 Dockerfile）
+    ports:
+      - "80:80"  # 主机 80 端口 → 容器 80 端口（浏览器直接访问 IP 即可）
+    depends_on:
+      - backend  # 依赖 backend 服务，启动顺序：先启动 backend 再启动 frontend
+    restart: always  # 容器异常退出时自动重启
+
+  # 后端容器
+  backend:
+    build: ./ruoyi-admin  # 构建上下文：后端项目目录（含 Dockerfile）
+    ports:
+      - "8080:8080"  # 后端端口
+    depends_on:
+      - mysql  # 依赖 mysql 服务，先启动 mysql
+      - redis  # 依赖 redis 服务，先启动 redis
+    environment:
+      # 后端连接数据库的环境变量（后端项目中读取这些变量）
+      - MYSQL_HOST=mysql  # 容器名作为 hostname（Docker 内部网络自动解析）
+      - MYSQL_PORT=3306
+      - MYSQL_DB=mtoi
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=1234
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: always
+
+  # 数据库容器
+  mysql:
+    image: mysql:8.0  # 直接使用官方镜像，无需自己构建
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=mtoi
+    volumes:
+      - mysql-data:/var/lib/mysql  # 数据持久化
+      - ./sql:/docker-entrypoint-initdb.d  # 初始化SQL脚本目录
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+
+  # Redis容器
+  redis:
+    image: redis:6.0  # Redis镜像
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data  # Redis数据持久化
+    restart: always
+
+# 声明 Docker 卷（数据持久化）
+volumes:
+  mysql-data:
+  redis-data:
