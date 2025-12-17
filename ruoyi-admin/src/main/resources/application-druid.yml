@@ -6,9 +6,10 @@ spring:
         druid:
             # 主库数据源
             master:
-                url: jdbc:mysql://localhost:3307/mtoi?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                username: root
-                password: 1234
+                # 本地默认：localhost:3307/mtoi；Docker环境：mysql:3307/mtoi（由docker-compose注入）
+                url: jdbc:mysql://${MYSQL_HOST:192.168.135.158}:${MYSQL_PORT:3307}/${MYSQL_DB:mtoi}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+                username: ${MYSQL_USER:root}  # 本地默认root，Docker环境由变量注入
+                password: ${MYSQL_PASSWORD:1234}  # 本地默认1234，Docker环境由变量注入
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭

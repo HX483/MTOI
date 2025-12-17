@@ -79,7 +79,12 @@
       <el-table-column label="仓库名称" align="center" prop="warehouseName" />
       <el-table-column label="仓库地址" align="center" prop="address" />
       <el-table-column label="负责人ID" align="center" prop="managerId" />
-      <el-table-column label="状态" align="center" prop="status" />
+
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['stock:warehouse:edit']">修改</el-button>
@@ -125,6 +130,7 @@ import { onMounted, nextTick, ref, reactive, toRefs } from "vue"
 
 const { proxy } = getCurrentInstance()
 const warehouseTable = ref(null)
+const { sys_normal_disable } = proxy.useDict('sys_normal_disable')
 
 const warehouseList = ref([])
 const open = ref(false)

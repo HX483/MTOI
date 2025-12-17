@@ -1,23 +1,22 @@
-version: '3.8'  # Compose 文件版本（需与 Docker 版本兼容）
-
 services:
-  # 前端容器
-  frontend:
-    build: ./RuoYi-Vue3  # 构建上下文：前端项目目录（含 Dockerfile）
-    ports:
-      - "80:80"  # 主机 80 端口 → 容器 80 端口（浏览器直接访问 IP 即可）
-    depends_on:
-      - backend  # 依赖 backend 服务，启动顺序：先启动 backend 再启动 frontend
-    restart: always  # 容器异常退出时自动重启
+ 
 
   # 后端容器
   backend:
-    build: ./ruoyi-admin  # 构建上下文：后端项目目录（含 Dockerfile）
+    build:   # 构建上下文：后端项目目录（含 Dockerfile）
+      context: ./backend-build  # 指定简化构建目录
+      dockerfile: Dockerfile
+    container_name: mtoi-backend
     ports:
       - "8080:8080"  # 后端端口
+    volumes:
+      # 仅挂载动态上传目录（upload），静态img已在镜像内
+      - ./upload:/app/upload
     depends_on:
-      - mysql  # 依赖 mysql 服务，先启动 mysql
-      - redis  # 依赖 redis 服务，先启动 redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       # 后端连接数据库的环境变量（后端项目中读取这些变量）
       - MYSQL_HOST=mysql  # 容器名作为 hostname（Docker 内部网络自动解析）
@@ -25,33 +24,72 @@ services:
       - MYSQL_DB=mtoi
       - MYSQL_USER=root
       - MYSQL_PASSWORD=1234
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
     restart: always
+    networks:
+      - mtoi-network  # 与 MySQL 在同一网络，可通过容器名访问
+
 
   # 数据库容器
   mysql:
-    image: mysql:8.0  # 直接使用官方镜像，无需自己构建
+    image: mysql:5.7
+    container_name: mtoi-mysql  # 容器名，方便后端连接
+    restart: always
+    environment:
+      - MYSQL_DATABASE=mtoi
+      - MYSQL_ROOT_PASSWORD=1234
+      - TZ=Asia/Shanghai
+    volumes:
+      # 挂载初始化 SQL 脚本（自动执行 sql 文件夹的所有 .sql 文件）
+      - ./sql:/docker-entrypoint-initdb.d
+      # 挂载数据卷（持久化 MySQL 数据，容器删除后数据不丢失）
+      - mysql-data:/var/lib/mysql
     ports:
       - "3307:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=mtoi
-    volumes:
-      - mysql-data:/var/lib/mysql  # 数据持久化
-      - ./sql:/docker-entrypoint-initdb.d  # 初始化SQL脚本目录
+    networks:
+      - mtoi-network  # 加入自定义网络，与后端容器通信
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p1234"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Redis容器
   redis:
-    image: redis:6.0  # Redis镜像
+    image: redis:5.0  # Redis镜像
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data  # Redis数据持久化
     restart: always
+    networks: # 加入自定义网络
+      - mtoi-network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
+
+ # 前端容器
+  frontend:
+    build: ./RuoYi-Vue3  # 构建上下文：前端项目目录（含 Dockerfile）
+    ports:
+      - "129:80"  # 主机 129 端口 → 容器 80 端口（浏览器直接访问 IP 即可）
+    depends_on:
+      - backend  # 依赖 backend 服务，启动顺序：先启动 backend 再启动 frontend
+    restart: always  # 容器异常退出时自动重启
+    networks:
+      - mtoi-network  # 加入自定义网络，与后端容器通信
+
+# 自定义网络（让容器之间用容器名通信，无需记 IP）
+networks:
+  mtoi-network:
+    driver: bridge
 # 声明 Docker 卷（数据持久化）
 volumes:
   mysql-data:

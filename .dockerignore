@@ -1,0 +1,22 @@
+# 排除前端目录（核心：忽略 Ruoyi-Vue3 整个文件夹）
+Ruoyi-Vue3/
+
+# 排除 Git 版本控制文件
+.git/
+.gitignore
+
+# 排除 IDE 配置文件（IDEA、VSCode）
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# 排除后端构建产物（避免本地 target 干扰容器内构建）
+**/target/
+
+# 排除文档、日志、备份等无关文件
+doc/
+log/
+sql.bak/
+*.log
+文档/

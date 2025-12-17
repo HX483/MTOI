@@ -1,0 +1,7 @@
+node_modules
+dist  # 本地打包目录，Docker 中会重新构建，无需复制
+.git
+.gitignore
+.env.development
+npm-debug.log
+yarn-error.log

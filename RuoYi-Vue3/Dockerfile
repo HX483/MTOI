@@ -1,5 +1,5 @@
 # 阶段1：构建前端项目
-FROM node:18-alpine as build-stage
+FROM node:18-alpine AS build-stage
 
 # 设置工作目录
 WORKDIR /app
@@ -23,7 +23,7 @@ FROM nginx:alpine
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # 复制自定义Nginx配置（可选）
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY vue-app.conf /etc/nginx/conf.d/default.conf
 
 # 暴露80端口
 EXPOSE 80
